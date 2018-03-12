@@ -1,0 +1,418 @@
+<!-- Footer Section -->
+<!-- Menu  -->
+
+<section id="footer-menu">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-5">
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">
+              <font size="2">Poker</font>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/trading">
+              <font size="2">Trading</font>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/sports">
+              <font size="2">Sports</font>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/tools">
+              <font size="2">Tools</font>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-2">
+        <ul class="main-menu-socail">
+          <li>
+            <a href="">
+              <i class="fa fa-facebook"></i>
+            </a>
+          </li>
+          <li>
+            <a href="">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+          <li>
+            <a href="">
+              <i class="fa fa-youtube"></i>
+            </a>
+          </li>
+          <li>
+            <a href="">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+          <li>
+            <a href="">
+              <i class="fa fa-instagram"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-5">
+        <ul class="main-menu-right nav">
+          <li>
+            <a class="nav-link" href="/blog">
+              <font size="2">Blog</font>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="/faq">
+              <font size="2">FAQ</font>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="">
+              <font size="2">Affiliate</font>
+            </a>
+          </li>
+          <li style="padding: 0px;">
+            <a class="nav-link" href="/tos">
+              <font size="2">Terms of Service</font>
+            </a>
+          </li>
+        </ul>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+<section id="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+
+
+        &copy; 2018 BTC Grinders, All Right Reserved.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="lib/simplemodal/lightboxController.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="lib/owl-carousel/owl.carousel.min.js"></script>
+<script src="js/custom.js"></script>
+<script>
+  $(document).ready(function () {
+    var exchangeValue;
+    $('#registerBtn').on('click', function (e) {
+      e.preventDefault();
+      const errorDiv = $('body #errorDiv');
+      const successDiv = $('body #successDiv');
+      errorDiv.html('').hide();
+      const filter = /^[\w\-.+]+@[a-zA-Z0-9.-]+\.[a-zA-z0-9]{2,4}$/;
+      const email = $('body input#email').val();
+      const tos = $('body input#tos').is(':checked');
+      if (!email || !filter.test(email)) {
+        errorDiv.html('Please enter a valid email address').show();
+        return;
+      }
+      if (tos) {
+        $.ajax({
+          url: '/users',
+          method: 'POST',
+          data: {
+            email: email
+          },
+          dataType: 'json',
+          success: function (success) {
+            window.location = '/dashboard'
+          },
+          error: function (error) {
+            errorDiv.html(error.responseJSON.message).show()
+          }
+        })
+      } else {
+        errorDiv.html('Please agree to the terms and condition.').show()
+      }
+    });
+
+    $('body #loginBtn').on('click', function (e) {
+      e.preventDefault();
+      const errorDiv = $('body #loginError');
+      errorDiv.html('').hide();
+      const email = $('body input#loginEmail').val();
+      const password = $('body input#loginPassword').val();
+      if (!email || !password) {
+        errorDiv.html('Please fill all fields').show();
+      } else {
+        $.ajax({
+          method: 'POST',
+          url: '/login',
+          data: {
+            password: password,
+            email: email
+          },
+          dataType: 'json',
+          success: function (result) {
+            window.location = '/dashboard'
+          },
+          error: function (err) {
+            errorDiv.html(err.responseJSON.message).show()
+          }
+        })
+      }
+    });
+
+    $('body #cryptocurrencyToCovertTo').on('change', function (e) {
+      e.preventDefault();
+      const value = $(this).val();
+      $.ajax({
+        method: 'GET',
+        url: `https://rest.coinapi.io/v1/exchangerate/USD/${value}`,
+        headers: {
+          'X-CoinAPI-Key': '7CF89C06-9A4D-4701-80C7-A6CA5F315B93'
+        },
+        dataType: 'JSON',
+        success: function (result) {
+          console.log(result, 'excahnges');
+          exchangeValue = result.rate;
+        },
+        error: function (error) {
+          console.log(error.response);
+        }
+      })
+    });
+
+    $('body #amountToConvert').on('keyup', function () {
+      const value = $(this).val();
+      const displayDiv = $('body #displayConvertedValue');
+      if (!exchangeValue) {
+        alert('Please select a cryptocurrency first!')
+        return
+      }
+      const converted = (value * exchangeValue) - ((1 / 100) * (value * exchangeValue));
+      displayDiv.html(`${converted} ${$('body #cryptocurrencyToCovertTo').val()}`);
+    })
+
+    $('body #convertToCrypto').on('click', function (e) {
+      e.preventDefault();
+      const errorDiv = $('body #exchangeError');
+      errorDiv.html('').hide();
+      const amount = $('body #amountToConvert').val();
+      const type = $('body #cryptocurrencyToCovertTo').val();
+      if (!exchangeValue || !amount) {
+        errorDiv.html('Please select a currency and ensure you typed an amount').show();
+        return
+      }
+      const value = (amount * exchangeValue) - ((1 / 100) * (amount * exchangeValue));
+      $.ajax({
+        method: 'POST',
+        url: '/convert',
+        data: {
+          amount: amount,
+          value: value,
+          type: type
+        },
+        dataType: 'json',
+        success: function (result) {
+          location.reload();
+        },
+        error: function (err) {
+          errorDiv.html(err.responseJSON.message).show()
+        }
+      })
+    });
+
+    $('body #withdraw').on('click', function (e) {
+      e.preventDefault();
+      const cashOutError = $('body #cashOutError');
+      cashOutError.html('').hide();
+      const cashOutCrypto = $('body #cashOutCrypto').val();
+      const cashOutAddress = $('body #cashOutAddress').val();
+      const cashOutAmount = $('body #cashOutAmount').val();
+      if (!cashOutAddress || !cashOutAmount || !cashOutCrypto) {
+        cashOutError.html('Please fill all fields').show();
+        return
+      }
+      $.ajax({
+        method: 'POST',
+        url: '/payout',
+        data: {
+          amount: cashOutAmount,
+          address: cashOutAddress,
+          type: cashOutCrypto
+        },
+        dataType: 'json',
+        success: function (result) {
+          cashOutError.html(result.message).show();
+          setTimeout(function () {
+            location.reload();
+          }, 1000)
+        },
+        error: function (err) {
+          cashOutError.html(err.responseJSON.message).show()
+        }
+      })
+    });
+
+    $('body #earnSubmit').on('click', function (e) {
+      e.preventDefault();
+      const earnError = $('body #earnError');
+      earnError.hide();
+      let earnUsername = $('body #earnUsername').val();
+      let earnSite = $('body #earnSite').val();
+      let earnSitename = $('body #earnSitename').val();
+      let earnAmount = $('body #earnAmount').val();
+      let earnType = $('body #earnType').val();
+      let earnEmail = $('body #earnEmail').val();
+      if (!earnAmount || !earnUsername || !earnSitename || !earnSite || !earnType || !earnEmail) {
+        earnError.html('Please fill all the fields').show();
+        return;
+      }
+      $.ajax({
+        method: 'POST',
+        data: {
+          email: earnEmail,
+          site_name: earnSitename,
+          site_type: earnSite,
+          username: earnUsername,
+          amount: earnAmount,
+          type: earnType
+        },
+        dataType: 'JSON',
+        url: '/earnings',
+        success: function (result) {
+          earnError.html('User credited successfully!').show();
+          $('body #earnUsername').val('')
+          $('body #earnSite').val('')
+          $('body #earnSitename').val('')
+          $('body #earnAmount').val('');
+          $('body #earnType').val('');
+          $('body #earnEmail').val('');
+        },
+        error: function (error) {
+          earnError.html(error.responseJSON.message).show();
+        }
+      })
+    });
+
+    $('body .confirm').on('click', function (e) {
+      e.preventDefault();
+      const id = $(this).attr('data-id');
+      const element = $(this);
+      $.ajax({
+        method: 'POST',
+        dataType: 'JSON',
+        url: '/confirm-payment',
+        data: {
+          id: id
+        },
+        success: function (result) {
+          element.closest('td').prev().text('paid')
+          element.attr('disabled', 'disabled').text('Confirmed').removeClass('cmn-btn');
+        },
+        error: function (error) {
+          alert(error.responseJSON)
+        }
+      })
+    });
+
+    $('body #signupButton').on('click', function (e) {
+      e.preventDefault();
+      const errorDiv = $('body #signupError');
+      errorDiv.hide();
+      const filter = /^[\w\-.+]+@[a-zA-Z0-9.-]+\.[a-zA-z0-9]{2,4}$/;
+      const email = $('body #signupEmail').val();
+      const site_name = $('body #signupSitename').val();
+      const site_type = $('body #signupSitetype').val();
+      const username = $('body #signupUsername').val();
+
+      if (!email || !site_name || !site_type || !username) {
+        errorDiv.html('Please fill all fields or refresh the page').show();
+        return;
+      }
+
+      if (!filter.test(email)) {
+        errorDiv.html('Please enter a valid email').show();
+        return;
+      }
+
+      $.ajax({
+        method: 'POST',
+        dataType: 'JSON',
+        url: '/add-site',
+        data: {
+          site_name: site_name,
+          site_type: site_type,
+          username: username,
+          email: email
+        },
+        success: function (result) {
+          if (result.type === 'new') {
+            window.location = '/dashboard'
+          } else {
+            errorDiv.html('Site added successfully').show()
+          }
+        },
+        error: function (error) {
+          errorDiv.html(error.responseJSON.message).show()
+        }
+      })
+    });
+
+    $('body #validSite').on('click', function (e) {
+      e.preventDefault();
+      const siteId = $('body #siteId').val();
+      const element = $(this);
+      $.ajax({
+        method: 'POST',
+        dataType: 'JSON',
+        url: '/confirm-site',
+        data: {
+          id: siteId,
+          status: 1
+        },
+        success: function (result) {
+          element.closest('td').parent('tr').find('.material-icons').text('check');
+          element.closest('td').html('<button id="submit" disabled>Verified</button>')
+        },
+        error: function (error) {
+          // errorDiv.html(error.responseJSON.message).show()
+          console.log(error.responseJSON.message)
+        }
+      })
+    })
+
+    $('body #invalidSite').on('click', function (e) {
+      e.preventDefault();
+      const siteId = $('body #siteId').val();
+      const element = $(this);
+      $.ajax({
+        method: 'POST',
+        dataType: 'JSON',
+        url: '/confirm-site',
+        data: {
+          id: siteId,
+          status: 2
+        },
+        success: function (result) {
+          element.closest('td').parent('tr').find('.material-icons').text('close');
+          element.closest('td').html('<button id="submit" disabled>Verified</button>')
+        },
+        error: function (error) {
+          // errorDiv.html(error.responseJSON.message).show()
+          console.log(error.responseJSON.message)
+        }
+      })
+    })
+  })
+</script>
+</body>
+
+</html>

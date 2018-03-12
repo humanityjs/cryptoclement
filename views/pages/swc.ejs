@@ -1,0 +1,63 @@
+<% include ../partials/header %>
+  <!-- End Topbar Section -->
+
+  <section id="main" class="sec-pad poker">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-5">
+          <a href="">
+            <img src="images/03.png">
+          </a>
+        </div>
+        <div class="col-md-7">
+          <ul>
+            <li>27% Flat Rakeback (Paid By Poker Room)</li>
+            <li>7.5% Rakeback Paid By Us</li>
+          </ul>
+        </div>
+      </div>
+      <div class="row text-left sec-pad">
+        <div class="col-md-4">
+          <h4>Step 1 </h4>
+          <b>Download</b>
+          <br>
+          <a href="">
+            <img src="images/TabLinksIcon_01.png" height="80" width="auto">
+          </a>
+        </div>
+        <div class="col-md-4">
+          <h4>Step 2 </h4>
+          <img src="images/Instructional_Guide.jpg" width="320px" height="auto">
+        </div>
+        <div class="col-md-4 step-3">
+          <h4>Step 3 </h4>
+          <div id="signupError"></div>
+          <P>Verify Your SWC Username </P>
+          <input id="signupUsername" type="text" name="Username">
+          <input id="signupSitename" type="hidden" name="sitename" value="<%=page%>">
+          <input id="signupSitetype" type="hidden" name="sitetype" value="<%=currentPage%>">
+          <br>
+          <% if (!user) { %>
+            <P>Join BTC Grinders</P>
+            <input id="signupEmail" type="text" name="Username" placeholder="Enter Your Email">
+            <br>
+            <div class="form-check">
+              <label class="form-check-label">
+                <input class="form-check-input" type="checkbox">I agree the Terms of Service.
+              </label>
+            </div>
+            <div class="but-div">
+              <button id="signupButton" href="#" class="cmn-btn">Create Account</button>
+            </div>
+            <% } else { %>
+              <div class="but-div">
+                <button id="signupButton" href="#" class="cmn-btn">Add site</button>
+                <input id="signupEmail" type="hidden" name="email" value="<%=user.email%>">
+              </div>
+              <% } %>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Footer Section -->
+  <% include ../partials/footer %>

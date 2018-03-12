@@ -1,0 +1,234 @@
+<% include ../partials/header %>
+  <section id="main" class="sec-pad poker">
+    <div class="container">
+      <div class="row">
+        <div class="d-flex flex-row mt-2">
+          <ul class="nav nav-tabs nav-tabs--vertical nav-tabs--left" role="navigation">
+            <li class="nav-item">
+              <a href="#lorem" class="nav-link active" data-toggle="tab" role="tab" aria-controls="lorem">EARNINGS</a>
+            </li>
+            <li class="nav-item">
+              <a href="#ipsum" class="nav-link" data-toggle="tab" role="tab" aria-controls="ipsum">PAYOUTS</a>
+            </li>
+            <li class="nav-item">
+              <a href="#sit-amet" class="nav-link" data-toggle="tab" role="tab" aria-controls="sit-amet">SITES</a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="lorem" role="tabpanel">
+              <div class="flex">
+                <div class="flex-first">
+                  <div class="convert">
+                    <h5>CREDIT USER</h5>
+                    <div id="earnError"></div>
+                    <div class="form-group">
+                      <label class="small" for="earnUsername">Enter Username</label>
+                      <input type="text" class="form-control" id="earnUsername" aria-describedby="earnUsername" placeholder="Enter Username">
+                    </div>
+                    <div class="form-group">
+                      <label class="small" for="earnEmail">Enter User Email</label>
+                      <input type="text" class="form-control" id="earnEmail" aria-describedby="earnUsername" placeholder="Enter Email">
+                    </div>
+                    <div class="form-group">
+                      <label class="small" for="earnSite">Select Site</label>
+                      <select class="form-control" name="earnSite" id="earnSite">
+                        <option value="">Please select</option>
+                        <option value="sports">Sports</option>
+                        <option value="tools">Tools</option>
+                        <option value="trading">Trading</option>
+                        <option value="poker">Poker</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="small" for="earnSitename">Select Sitename</label>
+                      <select class="form-control" name="earnSitename" id="earnSitename">
+                        <option value="">Please select</option>
+                        <option value="americas-cardroom">Americas Cardroom</option>
+                        <option value="betonline">Betonline</option>
+                        <option value="blackchip-poker">BlackChip poker</option>
+                        <option value="intertoops">Intertoops</option>
+                        <option value="nitogensports">Nitrogen Sports</option>
+                        <option value="swc">SWC</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="small" for="earnAmount">Enter Amount</label>
+                      <input type="number" class="form-control" id="earnAmount" aria-describedby="earnAmount" placeholder="Enter Amount">
+                    </div>
+
+                    <div class="form-group">
+                      <label class="small" for="earnType">Select currency</label>
+                      <select class="form-control" name="earnType" id="earnType">
+                        <option value="">Please select</option>
+                        <option value="USD">USD</option>
+                        <option value="BTC">BTC</option>
+                        <option value="ETH">ETH</option>
+                        <option value="BCH">BCH</option>
+                        <option value="LTC">LTC</option>
+                        <option value="DASH">DASH</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <button id="earnSubmit" class="cmn-btn">CREDIT USER</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex-second">
+                  <!-- <div class="address">
+                    <h5>CASHOUT</h5>
+                    <div class="form-group">
+                      <label class="small" for="email">Select cryptocurrency</label>
+                      <select name="cryptocurrenty" id="cryptocurrency">
+                        <option value="BTC">BTC</option>
+                        <option value="ETH">ETH</option>
+                        <option value="BCH">BCH</option>
+                        <option value="LTC">LTC</option>
+                        <option value="DASH">DASH</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="small" for="cryptoAddress">Enter Amount</label>
+                      <input type="cryptoAddress" class="form-control" id="cryptoAddress" aria-describedby="cryptoAddress" placeholder="Enter Address">
+                    </div>
+                    <div class="form-group">
+                      <label class="small" for="cryptoAddress">Address.</label>
+                      <input type="cryptoAddress" class="form-control" id="cryptoAddress" aria-describedby="cryptoAddress" placeholder="Enter Address">
+                    </div>
+                    <div class="form-group">
+                      <button id="submit" class="cmn-btn">Cashout</button>
+                    </div>
+                  </div> -->
+                </div>
+              </div>
+            </div>
+
+            <!-- 2nd -->
+            <div class="tab-pane fade" id="ipsum" role="tabpanel">
+              <div class="history">
+                <h5>PAYOUT REQUESTS</h5>
+                <div class="history-list">
+                  <p>Pocker</p>
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>EMAIL</th>
+                        <th>AMOUNT</th>
+                        <th>CURRENCY</th>
+                        <th>ADDRESS</th>
+                        <th>STATUS</th>
+                        <th>action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if (payouts.length > 0) { %>
+                        <% payouts.forEach(function(payout) { %>
+                          <tr>
+                            <td>
+                              <%= payout.email %>
+                            </td>
+                            <td>
+                              <%= payout.amount %>
+                            </td>
+                            <td>
+                              <%= payout.type.toUpperCase() %>
+                            </td>
+                            <td>
+                              <%= payout.address %>
+                            </td>
+                            <td id="paidStatus">
+                              <%= payout.status === 0 ? 'pending' : 'paid' %>
+                            </td>
+                            <td>
+                              <% if (payout.status===1) { %>
+                                <button disabled> Confirmed
+                                </button>
+                                <% } else { %>
+                                  <button data-id="<%= payout.id %>" class="cmn-btn confirm"> Confirm
+                                  </button>
+                                  <% } %>
+                            </td>
+                          </tr>
+                          <% }) %>
+                            <% } else { %>
+                              <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <% } %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- 3rd -->
+            <div class="tab-pane fade" id="sit-amet" role="tabpanel">
+              <div class="history">
+                <h5>HISTORY</h5>
+                <div class="history-list">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>SITES</th>
+                        <th>USERNAME</th>
+                        <th>EMAIL</th>
+                        <th>ACTION</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if (sites.length > 0) { %>
+                        <% sites.forEach(function(site) { %>
+                          <tr>
+                            <td>
+                              <%= site.site_name %>
+                            </td>
+                            <td>
+                              <%= site.username %>
+                                <% if (site.status === 0) { %>
+                                  <i class="material-icons">timer</i>
+                                  <% } else if (site.status === 1) { %>
+                                    <i class="material-icons">check</i>
+                                    <% } else { %>
+                                      <i class="material-icons">close</i>
+                                      <% } %>
+                            </td>
+                            <td>
+                              <%= site.email || 0 %>
+                            </td>
+                            <td>
+                              <% if (site.status === 0) { %>
+                                <input id="siteId" type="hidden" name="siteId" value="<%=site.id%>">
+                                <button id="validSite" class="cmn-btn">Valid</button>
+                                <button id="invalidSite" style="background-color: red;" class="cmn-btn">Invalid</button>
+                                <% } else { %>
+                                  <button id="submit" disabled>Verified</button>
+                                  <% } %>
+                            </td>
+                          </tr>
+                          <% }) %>
+                            <% } else { %>
+                              <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <% } %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <% include ../partials/footer %>

@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Fonts Css -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,600i,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <!-- Owl Carousel Css -->
+  <link rel="stylesheet" href="lib/owl-carousel/owl.carousel.min.css">
+  <link rel="stylesheet" href="lib/owl-carousel/owl.theme.default.min.css">
+  <!-- Lightbox Css -->
+  <link rel="stylesheet" type="text/css" href="lib/simplemodal/lightbox.css">
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <!-- Main CSS -->
+  <link rel="stylesheet" type="text/css" href="assets/css/responsive.css">
+
+  <title>Exclusive Cryptocurrency Rakeback, Rewards, Rebates, and Deals!</title>
+</head>
+
+<body>
+  <section id="top">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="logo">
+            <a href="/">
+              <img src="images/BTC_Grinders_logo.png" height="auto" width="250">
+            </a>
+          </div>
+          <div class="currency-icons">
+            <li>
+              <a href="">
+                <img src="images/icons/unnamed.png" height="35px" width="auto">
+              </a>
+            </li>
+            <li>
+              <a href="">
+                <img src="images/icons/22.png" height="35px" width="auto">
+              </a>
+            </li>
+            <li>
+              <a href="">
+                <img src="images/icons/55.png" height="35px" width="auto">
+              </a>
+            </li>
+            <li>
+              <a href="">
+                <img src="images/icons/44.png" height="35px" width="auto">
+              </a>
+            </li>
+            <li>
+              <a href="">
+                <img src="images/icons/bch1.png" height="35px" width="auto">
+              </a>
+            </li>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="right-top  text-right">
+            <h4>
+              <font color="984E11">Exclusive Cryptocurrency Rewards!</font>
+            </h4>
+            <% if (!user) { %>
+              <button class="cmn-btn" data-toggle="modal" data-target="#signup-modal">Create Account</button>
+              <% } %>
+                <!-- The Modal -->
+                <div class="modal fade" id="signup-modal">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+
+                      <!-- Modal Header -->
+                      <div class="modal-header">
+                        <h4 class="modal-title">Register with Us</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      </div>
+
+                      <!-- Modal body -->
+                      <div class="modal-body">
+                        <div class="text-center login-form">
+                          <div class="error" id="errorDiv"></div>
+                          <div class="success" id="successDiv"></div>
+                          <form>
+                            <div class="form-group">
+                              <label for="email">Enter Your Email Address</label>
+                              <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter Email and Password will be Sent">
+                            </div>
+                            <div class="form-check">
+                              <label class="form-check-label">
+                                <input class="form-check-input" id="tos" type="checkbox"> I agree with the
+                                <a href="/tos">
+                                  <u>Terms of Service</u>
+                                </a>.
+                              </label>
+                            </div>
+                            <div class="text-center but-div">
+                              <button id="registerBtn" class="cmn-btn">Create Account</button>
+                            </div>
+                          </form>
+
+                          <div class="text-center">
+                            <br>
+                            <p>Already a Member?</p>
+                            <div class="but-div">
+                              <a href="/login">
+                                <button class="cmn-btn ">Login Now</button>
+                              </a>
+                            </div>
+                            <br>
+                            <ul class="reg-menu text-center">
+                              <li>
+                                <a href="/contact">Contact Us</a>
+                              </li>
+                              <li>
+                                <a href="/tos">Help</a>
+                              </li>
+                              <li>
+                                <a href="/forgot-pas">Forgot Password?</a>
+                              </li>
+                            </ul>
+                          </div>
+
+                        </div>
+                      </div>
+
+                      <!-- Modal footer -->
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <!-- End create accoint modal -->
+
+                <ul class="reg-menu">
+                  <% if (!user) { %>
+                    <li>
+                      <a href="/contact">
+                        <font size="1">Contact Us</font>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="/forgot-pas">
+                        <font size="1">Forgot Password?</font>
+                      </a>
+                    </li>
+                    <% } else { %>
+                      <li>
+                        <a href="/dashboard">
+                          <font size="1">Welcome,
+                            <%= user.email %>
+                          </font>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/logout">
+                          <font size="1">logout</font>
+                        </a>
+                      </li>
+                      <% } %>
+                </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Menu  -->
+
+  <section id="menu">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-5">
+          <ul class="nav">
+            <li class="nav-item">
+              <% if (currentPage === 'poker') {%>
+                <a class="nav-link active1" href="/">Poker</a>
+                <% } else { %>
+                  <a class="nav-link" href="/">Poker</a>
+                  <% } %>
+            </li>
+
+            <li class="nav-item">
+              <% if (currentPage === 'trading') {%>
+                <a class="nav-link active1" href="/trading">Trading</a>
+                <% } else { %>
+                  <a class="nav-link" href="/trading">Trading</a>
+                  <% } %>
+            </li>
+            <li class="nav-item">
+              <% if (currentPage === 'sports') {%>
+                <a class="nav-link active1" href="/sports">Sports</a>
+                <% } else { %>
+                  <a class="nav-link" href="/sports">Sports</a>
+                  <% } %>
+            </li>
+            <li class="nav-item">
+              <% if (currentPage === 'tools') {%>
+                <a class="nav-link active1" href="/tools">Tools</a>
+                <% } else { %>
+                  <a class="nav-link" href="/tools">Tools</a>
+                  <% } %>
+            </li>
+          </ul>
+        </div>
+        <div class="col-md-2">
+          <ul class="main-menu-socail">
+            <li>
+              <a href="">
+                <i class="fa fa-facebook"></i>
+              </a>
+            </li>
+            <li>
+              <a href="">
+                <i class="fa fa-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="">
+                <i class="fa fa-youtube"></i>
+              </a>
+            </li>
+            <li>
+              <a href="">
+                <i class="fa fa-google-plus"></i>
+              </a>
+            </li>
+            <li>
+              <a href="">
+                <i class="fa fa-instagram"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="col-md-5">
+          <ul class="main-menu-right nav">
+            <li>
+              <% if (page === 'blog') {%>
+                <a class="nav-link active1" href="/blog">
+                  <b>Blog</b>
+                </a>
+                <% } else { %>
+                  <a class="nav-link" href="/blog">
+                    <b>Blog</b>
+                  </a>
+                  <% } %>
+            </li>
+            <li>
+              <% if (page === 'faq') {%>
+                <a class="nav-link active1" href="/faq">
+                  <b>Faq</b>
+                </a>
+                <% } else { %>
+                  <a class="nav-link" href="/faq">
+                    <b>Faq</b>
+                  </a>
+                  <% } %>
+            </li>
+            <li>
+              <a class="nav-link" href="">Affiliate</a>
+            </li>
+            <% if (user && page === 'dashboard') {%>
+              <li>
+                <a class="nav-link active1" href="/dashboard">Dashboard</a>
+              </li>
+              <% } else if (user && page !== 'dashboard') {%>
+                <li>
+                  <a class="nav-link" href="/dashboard">Dashboard</a>
+                </li>
+                <% } else { %>
+                  <li>
+                    <a data-toggle="modal" data-target="#login-modal" class="login-item"> Login </a>
+                    <i class="fa fa-user"></i>
+                    <% } %>
+                      <% if (user && user.role === 1 && page === 'admin') { %>
+                        <li>
+                          <a class="nav-link active1" href="/admin">Admin</a>
+                        </li>
+                        <% } else if (user && user.role === 1 && page !== 'admin') { %>
+                          <li>
+                            <a class="nav-link" href="/admin">Admin</a>
+                          </li>
+                          <% } else { %>
+
+                            <% } %>
+
+                              <!-- The Modal -->
+                              <div class="modal fade" id="login-modal">
+                                <div class="modal-dialog modal-dialog-centered">
+                                  <div class="modal-content">
+
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                      <h4 class="modal-title">Log In</h4>
+                                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <!-- Modal body -->
+                                    <div class="modal-body">
+                                      <div class="text-left login-form">
+                                        <div id="loginError"></div>
+                                        <form action="" method="">
+                                          <div class="form-group">
+                                            <label for="loginEmail">Email address</label>
+                                            <input type="loginEmail" class="form-control" id="loginEmail" aria-describedby="loginEmail" placeholder="Enter email">
+                                          </div>
+                                          <div class="form-group">
+                                            <label for="loginPassword">Password</label>
+                                            <input type="password" class="form-control" id="loginPassword" placeholder="Password">
+                                          </div>
+                                          <div class="text-center">
+                                            <button id="loginBtn" class="cmn-btn">Login</button>
+                                          </div>
+                                        </form>
+                                        <ul class="reg-menu text-center">
+                                          <li>
+                                            <a href="/contact">Contact Us</a>
+                                          </li>
+                                          <li>
+                                            <a href="/tos">Help</a>
+                                          </li>
+                                          <li>
+                                            <a href="/forgot-pas">Forgot Password?</a>
+                                          </li>
+                                        </ul>
+                                        <p class="text-center">New User?</p>
+                                        <div class="text-center but-div">
+
+                                          <a href="/register">
+                                            <button class="cmn-btn">Register Now</button>
+                                          </a>
+                                        </div>
+
+                                      </div>
+                                    </div>
+
+                                    <!-- Modal footer -->
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                  </div>
+                                </div>
+                              </div>
+
+                  </li>
+          </ul>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <% if (page !== 'dashboard' && page !== 'admin') { %>
+    <section id="secondary-menu">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <ul class="nav">
+              <li class="nav-item">
+                <% if (page === 'blackchip-poker') {%>
+                  <a class="nav-link active1" href="/blackchip-poker">BlackChip</a>
+                  <% } else { %>
+                    <a class="nav-link" href="/blackchip-poker">BlackChip</a>
+                    <% } %>
+              </li>
+
+              <li class="nav-item">
+                <% if (page === 'americas-cardroom') {%>
+                  <a class="nav-link active1" href="/americas-cardroom">ACR</a>
+                  <% } else { %>
+                    <a class="nav-link" href="/americas-cardroom">ACR</a>
+                    <% } %>
+              </li>
+              <li class="nav-item">
+                <% if (page === 'swc') {%>
+                  <a class="nav-link active1" href="/swc">SWC</a>
+                  <% } else { %>
+                    <a class="nav-link" href="/swc">SWC</a>
+                    <% } %>
+              </li>
+              <li class="nav-item">
+                <% if (page === 'betonline') {%>
+                  <a class="nav-link active1" href="/betonline">BetOnline</a>
+                  <% } else { %>
+                    <a class="nav-link" href="/betonline">BetOnline</a>
+                    <% } %>
+              </li>
+              <li class="nav-item">
+                <% if (page === 'intertoops') {%>
+                  <a class="nav-link active1" href="/intertoops">Intertops</a>
+                  <% } else { %>
+                    <a class="nav-link" href="/intertoops">Intertops</a>
+                    <% } %>
+              </li>
+              <li class="nav-item">
+                <% if (page === 'nitrogensports') {%>
+                  <a class="nav-link active1" href="/nitrogensports">Nitrogen</a>
+                  <% } else { %>
+                    <a class="nav-link" href="/nitrogensports">Nitrogen</a>
+                    <% } %>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <% } %>

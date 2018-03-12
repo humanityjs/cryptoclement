@@ -1,0 +1,385 @@
+<% include ../partials/header %>
+  <section id="main" class="sec-pad poker">
+    <div class="container">
+      <div class="row">
+        <div class="d-flex flex-row mt-2">
+          <ul class="nav nav-tabs nav-tabs--vertical nav-tabs--left" role="navigation">
+            <li class="nav-item">
+              <a href="#lorem" class="nav-link active" data-toggle="tab" role="tab" aria-controls="lorem">CASHIER</a>
+            </li>
+            <li class="nav-item">
+              <a href="#ipsum" class="nav-link" data-toggle="tab" role="tab" aria-controls="ipsum">SITES</a>
+            </li>
+            <li class="nav-item">
+              <a href="#sit-amet" class="nav-link" data-toggle="tab" role="tab" aria-controls="sit-amet">HISTORY</a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="lorem" role="tabpanel">
+              <div class="flex">
+                <div class="flex-first">
+                  <div class="settings">
+                    <div class="form-group">
+                      <button id="submit" class="btn btn-primary">Add 2-factor Authentication</button>
+                    </div>
+                    <div class="form-group">
+                      <button id="submit" class="btn btn-primary">Change Email</button>
+                    </div>
+                    <div class="form-group">
+                      <button id="submit" class="btn btn-primary">Change Password</button>
+                    </div>
+                  </div>
+                  <div class="balance">
+                    <h5>BALANCES</h5>
+                    <p>USD: $
+                      <%= earnings.usd %>
+                    </p>
+                    <p>BTC:
+                      <%= earnings.btc %>
+                    </p>
+                    <p>ETH:
+                      <%= earnings.eth %>
+                    </p>
+                    <p>LTC:
+                      <%= earnings.ltc %>
+                    </p>
+                    <p>BCH:
+                      <%= earnings.bch %>
+                    </p>
+                    <p>DASH:
+                      <%= earnings.dash %>
+                    </p>
+                  </div>
+                  <div class="convert">
+                    <h5>CONVERT TO CRYPTOCURRENCY</h5>
+                    <div id="exchangeError"></div>
+                    <div class="form-group">
+                      <label class="small" for="cryptocurrencyToCovertTo">Select cryptocurrency</label>
+                      <select class="form-control" name="cryptocurrencyToCovertTo" id="cryptocurrencyToCovertTo">
+                        <option value="">SELECT ONE</option>
+                        <option value="BTC">BTC</option>
+                        <option value="ETH">ETH</option>
+                        <option value="BCH">BCH</option>
+                        <option value="LTC">LTC</option>
+                        <option value="DASH">DASH</option>
+                      </select>
+                    </div>
+                    <input type="hidden" name="cryptoValue" id="cryptoValue" value="">
+                    <div class="form-group">
+                      <label class="small" for="amountToConvert">Enter Amount</label>
+                      <input type="number" class="form-control" id="amountToConvert" aria-describedby="amountToConvert" placeholder="Enter Amount">
+                      <div class="realtime">
+                        <span>You get:
+                          <span id="displayConvertedValue"></span>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <button class="cmn-btn" id="convertToCrypto">Convert</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex-second">
+                  <div class="address">
+                    <h5>CASHOUT</h5>
+                    <div id="cashOutError"></div>
+                    <div class="form-group">
+                      <label class="small" for="cashOutCrypto">Select cryptocurrency</label>
+                      <select class="form-control" name="cashOutCrypto" id="cashOutCrypto">
+                        <option value="">SELECT ONE</option>
+                        <option value="BTC">BTC</option>
+                        <option value="ETH">ETH</option>
+                        <option value="BCH">BCH</option>
+                        <option value="LTC">LTC</option>
+                        <option value="DASH">DASH</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="small" for="cashOutAmount">Enter Amount</label>
+                      <input type="cashOutAmount" class="form-control" id="cashOutAmount" aria-describedby="cryptoAddress" placeholder="Enter Amount">
+                    </div>
+                    <div class="form-group">
+                      <label class="small" for="cashOutAddress">Address.</label>
+                      <input type="cashOutAddress" class="form-control" id="cashOutAddress" aria-describedby="cryptoAddress" placeholder="Enter Address">
+                    </div>
+                    <div class="form-group">
+                      <button id="withdraw" class="cmn-btn">Withdraw</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2nd -->
+            <div class="tab-pane fade" id="ipsum" role="tabpanel">
+              <div class="history">
+                <h5>SITE HISTORY</h5>
+                <div class="history-list">
+                  <p>Pocker</p>
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>SITES</th>
+                        <th>USERNAME</th>
+                        <th>BONUS</th>
+                        <th>RAKEBACK 1</th>
+                        <th>RAKEBACK 2</th>
+                        <th>RAKEBACK 3</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if (sites.length > 0) { %>
+                        <% sites.forEach(function(site) { if (site.site_type === 'poker') { %>
+                          <tr>
+                            <td>
+                              <%= site.site_name %>
+                            </td>
+                            <td>
+                              <%= site.username %>
+                                <% if (site.status === 0) { %>
+                                  <i class="material-icons">timer</i>
+                                  <% } else if (site.status === 1) { %>
+                                    <i class="material-icons">check</i>
+                                    <% } else { %>
+                                      <i class="material-icons">close</i>
+                                      <% } %>
+                            </td>
+                            <td>
+                              <%= site.bonus || 0 %>
+                            </td>
+                            <td>
+                              <%= site.rakeback_one || 0 %>
+                            </td>
+                            <td>
+                              <%= site.rakeback_two || 0 %>
+                            </td>
+                            <td>
+                              <%= site.rakeback_three || 0 %>
+                            </td>
+                          </tr>
+                          <% }}) %>
+                            <% } else { %>
+                              <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <% } %>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="history-list">
+                  <p>Trading</p>
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>SITES</th>
+                        <th>USERNAME</th>
+                        <th>BETBACK</th>
+                        <th>LOSSBACK</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if (sites.length > 0) {  %>
+                        <% sites.forEach(function(site) { if (site.site_type === 'trading') { %>
+                          <tr>
+                            <td>
+                              <%= site.site_name %>
+                            </td>
+                            <td>
+                              <%= site.username %>
+                                <% if (site.status === 0) { %>
+                                  <i class="material-icons">timer</i>
+                                  <% } else if (site.status === 1) { %>
+                                    <i class="material-icons">check</i>
+                                    <% } else { %>
+                                      <i class="material-icons">close</i>
+                                      <% } %>
+                            </td>
+                            <td>
+                              <%= site.betback || 0 %>
+                            </td>
+                            <td>
+                              <%= site.lossback || 0 %>
+                            </td>
+                          </tr>
+                          <% }}) %>
+                            <% } else { %>
+                              <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <% } %>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="history-list">
+                  <p>Sports</p>
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>SITES</th>
+                        <th>USERNAME</th>
+                        <th>BONUS</th>
+                        <th>FEE REBATE</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if (sites.length > 0) { %>
+                        <% sites.forEach(function(site) { if (site.site_type === 'sports') { %>
+                          <tr>
+                            <td>
+                              <%= site.site_name %>
+                            </td>
+                            <td>
+                              <%= site.username %>
+                                <% if (site.status === 0) { %>
+                                  <i class="material-icons">timer</i>
+                                  <% } else if (site.status === 1) { %>
+                                    <i class="material-icons">check</i>
+                                    <% } else { %>
+                                      <i class="material-icons">close</i>
+                                      <% } %>
+                            </td>
+                            <td>
+                              <%= site.bonus || 0 %>
+                            </td>
+                            <td>
+                              <%= site.free_rebate || 0 %>
+                            </td>
+                          </tr>
+                          <% }}) %>
+                            <% } else { %>
+                              <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <% } %>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="history-list">
+                  <p>Tools</p>
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>SITES</th>
+                        <th>USERNAME</th>
+                        <th>REBATE (%)</th>
+                        <th>REWARDS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if (sites.length > 0) { %>
+                        <% sites.forEach(function(site) { if (site.site_type === 'tools') { %>
+                          <tr>
+                            <td>
+                              <%= site.site_name %>
+                            </td>
+                            <td>
+                              <%= site.username %>
+                                <% if (site.status === 0) { %>
+                                  <i class="material-icons">timer</i>
+                                  <% } else if (site.status === 1) { %>
+                                    <i class="material-icons">check</i>
+                                    <% } else { %>
+                                      <i class="material-icons">close</i>
+                                      <% } %>
+                            </td>
+                            <td>
+                              <%= site.free_rebate || 0 %>
+                            </td>
+                            <td>
+                              <%= site.rewards || 0 %>
+                            </td>
+                          </tr>
+                          <% }}) %>
+                            <% } else { %>
+                              <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <% } %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- 3rd -->
+            <div class="tab-pane fade" id="sit-amet" role="tabpanel">
+              <div class="history">
+                <h5>HISTORY</h5>
+                <div class="history-list">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>USERNAME</th>
+                        <th>DATE</th>
+                        <th>REFERENCE</th>
+                        <th>TYPE</th>
+                        <th>AMOUNT</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if (histories.length > 0) {  let i = 0; %>
+                        <% histories.forEach(function(history) { %>
+                          <tr>
+                            <th scope="row">
+                              <%= i + 1 %>
+                            </th>
+                            <td>
+                              <%= history.username %>
+                            </td>
+                            <td>
+                              <%= new Date(history.date).getFullYear() %>-
+                                <%=new Date(history.date).getMonth() %>-
+                                  <%=new Date(history.date).getDate() %>
+                            </td>
+                            <td>
+                              <%= history.type %>
+                            </td>
+                            <td>
+                              <%= history.amountType %>
+                            </td>
+                            <td>
+                              <%= history.amount %>
+                            </td>
+                          </tr>
+                          <% i += 1; }) %>
+                            <% } else { %>
+                              <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <% } %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <% include ../partials/footer %>

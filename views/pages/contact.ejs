@@ -1,0 +1,44 @@
+<% include ../partials/header %>
+    <!-- End Topbar Section -->
+
+<section id="main" class="sec-pad">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2"></div>
+       <div class="col-md-8">
+        <div class="contact-form">
+          <h2 class="contact-title">
+            Contact Us
+          </h2>
+	          <div class="contac-info">
+	          <h4>Email</h4>
+	          <h5>admin@gmail.com</h5>
+	       	 </div>
+          <h2>
+          	Or Use This Form
+          </h2>
+          <form action="" method="">
+            <div class="full-input">
+              <input type="email" name="email" placeholder="Enter Your Email">
+            </div>
+            <div class="full-input">
+              <input type="text" name="subject" placeholder="Enter Your Subject">
+            </div>
+            <div class="full-input">
+              <textarea name="message" placeholder="Enter Your Message"></textarea>
+            </div>
+
+                <!-- Replace data-sitekey with your own one, generated at https://www.google.com/recaptcha/admin -->
+                   <div class="g-recaptcha" data-sitekey="6LcbkEQUAAAAAL8Q8Tl7r_QOqtr5O5UtywpYvqXG"></div>
+
+            <button type="Submit" name="send" class="cmn-btn">Send Message</button>
+          </form>
+         </div>
+        </div>
+        <div class="col-md-2"></div>
+      </div>
+    </div>
+</section>
+
+<!-- Footer Section -->
+    <% include ../partials/footer %>

@@ -1,0 +1,274 @@
+$global-link-color: #ddd;
+$global-color: #ddd;
+// 1. Your custom variables and variable overwrites.
+@import '~uikit/src/scss/theme/accordion.scss';
+@import '~uikit/src/scss/theme/alert.scss';
+@import '~uikit/src/scss/theme/align.scss';
+// ... import all
+// 2. Import default variables and available mixins.
+@import '~uikit/src/scss/variables.scss';
+@import '~uikit/src/scss/mixins.scss';
+// 3. Your custom mixin overwrites.
+// @import '~uikit/src/scss/theme/accordion-mixins.scss';
+// @import '~uikit/src/scss/theme/alert-mixins.scss';
+// @import '~uikit/src/scss/theme/align-mixins.scss';
+// ... import all
+// 4. Import UIkit
+@import '~uikit/src/scss/uikit.scss';
+
+body {
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+  overflow-x: hidden;
+  color: #637986;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-size: 15px;
+}
+
+a:hover {
+  text-decoration: none;
+  transition: 0.3s ease;
+  color: #fff;
+}
+
+// Customs
+
+.p30 {
+  padding: 30px;
+}
+
+input {
+  color: black !important;
+}
+
+.pl-15 {
+  padding-left: 15px;
+}
+
+.ml-15 {
+  margin-left: 15px;
+}
+
+.p0 {
+  padding: 0px !important;
+}
+
+.center {
+  text-align: center;
+}
+
+.bb {
+  border-bottom: thin solid #637986;
+  font-weight: 300;
+  color: #222;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.bbw {
+  border-bottom: thin solid #fff;
+  font-weight: 300;
+  color: #222;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.uk-grid {
+  margin: 0px;
+}
+
+.uk-navbar {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.Select-control {
+  width: 250px !important;
+}
+
+.uk-navbar img {
+  max-width: 100%;
+  height: 100%;
+}
+.uk-background-primary {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.uk-nav-default {
+  font-size: 14px;
+}
+
+.uk-accordion-title::after {
+  content: '';
+  width: 1.4em;
+  height: 1.4em;
+  float: right;
+  background-image: url(data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2213%22%20height%3D%2213…22%20height%3D%2213%22%20x%3D%226%22%20y%3D%220%22%20%2F%3E%0A%3C%2Fsvg%3E);
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+
+.uk-table th {
+  padding: 16px 12px;
+  text-align: left;
+  vertical-align: bottom;
+  font-size: 12px;
+  font-weight: normal;
+  color: #eee;
+  text-transform: uppercase;
+}
+
+/** Login Page */
+
+.bg-height {
+  min-height: 80vh;
+}
+
+.login-card {
+  min-width: 400px;
+  .uk-card-body {
+    padding: 5px;
+    // min-width: 330px;
+
+    img {
+      height: 70px;
+      width: 70px;
+    }
+
+    .uk-margin {
+      margin: 0px;
+
+      .uk-inline {
+        width: 300px;
+
+        a {
+          font-size: 12px;
+        }
+
+        a:hover {
+          text-decoration: none;
+          transition: 0.5s ease;
+          color: #fff;
+        }
+      }
+    }
+    .btn-border {
+      border-radius: 30px;
+    }
+
+    .uk-alert {
+      margin-bottom: 0px;
+    }
+  }
+}
+
+.login-footer {
+  background-color: rgba(0, 0, 0, 0.9);
+  min-height: 50px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+
+  p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    line-height: 17px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+.tm-main {
+  padding: 15px;
+}
+
+.tm-main .uk-container {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.tm-sidebar-left {
+  position: fixed;
+  top: 80px;
+  bottom: 0;
+  box-sizing: border-box;
+  width: 240px !important;
+  padding: 40px 40px 60px 40px;
+  border-right: 1px #e5e5e5 solid;
+  overflow: auto;
+}
+
+.uk-container-small {
+  max-width: 800px;
+}
+
+/** Dashboard */
+.b-main {
+  .uk-card-body {
+    padding: 10px;
+    min-height: 150px;
+    text-align: center;
+
+    p {
+      font-size: 30px;
+    }
+  }
+
+  .uk-card-title {
+    font-size: 16px;
+  }
+
+  .uk-accordion {
+    a.uk-accordion-title:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .acc-header {
+    font-weight: 400;
+    color: white;
+
+    span {
+      margin: 0px 20px;
+    }
+  }
+}
+
+.uk-table {
+  th {
+    text-align: center;
+    color: #000;
+  }
+  text-align: center;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+// Profile
+
+.b-profile {
+  .uk-input {
+    width: 400px;
+  }
+}
+
+@media (min-width: 640px) {
+  .tm-main .uk-container {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+}
+
+@media (min-width: 960px) {
+  .tm-main .uk-container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .tm-sidebar-left + .tm-main {
+    padding-left: 240px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .tm-sidebar-left + .tm-main {
+    padding-left: 40px;
+  }
+}
