@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import logoutAction from '../actions/logoutAction';
-import { deleteStore } from '../actions/userAction';
+import { deleteStore } from '../actions/userAction'; //
 
 /**
  * Dashboard component

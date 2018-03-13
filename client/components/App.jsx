@@ -1,6 +1,7 @@
 import React from 'react';
 import { Switch, BrowserRouter as Router, Route } from 'react-router-dom';
 import Header from './Header';
+import Subnav from './Subnav';
 import Login from './Login';
 // import Admin from './Admin';
 import Dashboard from './Dashboard';
@@ -15,6 +16,7 @@ import AuthContainer from './AuthContainer'; //
 // import Types from './Types';
 // import About from './About';
 // import Contact from './Contact';
+import Home from './Home';
 import Users from './Users';
 import Contracts from './Contracts';
 import Earnings from './Earnings';
@@ -23,17 +25,18 @@ import PasswordReset from './PasswordReset';
 const App = () => (
   <Router>
     <div>
-      {/* <Header /> */}
+      <Header />
+      <Subnav />
       <div className="div-wrappper">
         <Switch>
-          <AuthContainer exact path="/" name="login" Comp={Login} />
+          {/* <AuthContainer exact path="/" name="login" Comp={Login} /> */}
           <AuthContainer
             exact
             path="/reset-password"
             name="reset"
             Comp={PasswordReset}
           />
-          {/* <Route exact path="/about" component={About} /> */}
+          <Route exact path="/" component={Home} />
           {/* <Route exact path="/contact" component={Contact} /> */}
           <AuthContainer
             exact

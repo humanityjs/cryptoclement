@@ -47,6 +47,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.18.2",
+    "bootstrap": "^4.0.0-beta.3",
     "clean-webpack-plugin": "^0.1.17",
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.3",
