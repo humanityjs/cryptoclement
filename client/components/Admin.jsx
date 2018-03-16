@@ -93,13 +93,13 @@ class Admin extends Component {
             this.props.getAdmin();
           });
       }, (({ response }) => {
-          swal({
-            title: 'Error',
-            html: response.data.message,
-            type: 'error',
-            allowOutsideClick: false
-          });
-        }));
+        swal({
+          title: 'Error',
+          html: response.data.message,
+          type: 'error',
+          allowOutsideClick: false
+        });
+      }));
   }
 
   verifySite(id, status) {
@@ -115,13 +115,13 @@ class Admin extends Component {
             this.props.getAdmin();
           });
       }, (({ response }) => {
-          swal({
-            title: 'Error',
-            html: response.data.message,
-            type: 'error',
-            allowOutsideClick: false
-          });
-        }));
+        swal({
+          title: 'Error',
+          html: response.data.message,
+          type: 'error',
+          allowOutsideClick: false
+        });
+      }));
   }
 
   payouts() {
@@ -223,7 +223,7 @@ class Admin extends Component {
                 </button>
               </span>
             ) : (
-              <button id="submit" disabled>
+                <button id="submit" disabled>
                   Verified
                 </button>
               )}
@@ -307,6 +307,7 @@ class Admin extends Component {
    * @memberOf Dashboard
    */
   render() {
+    const { error } = this.state;
     return (
       <section id="main" className="sec-pad poker">
         <div className="container">
@@ -371,7 +372,9 @@ class Admin extends Component {
                     <div className="flex-first">
                       <div className="convert">
                         <h5>CREDIT USER</h5>
-                        <div id="earnError" />
+                        {error && (
+                          <div className="error">{error}</div>
+                        )}
                         <div className="form-group">
                           <label className="small" htmlFor="earnUsername">
                             Enter Username

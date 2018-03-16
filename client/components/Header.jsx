@@ -1,21 +1,28 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
+import { registerUser } from '../actions/userAction';
 import logoutAction from '../actions/logoutAction';
 import { saveCurrent, saveSub } from '../actions/pathActions';
 
 class Header extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      email: '',
+      error: '',
+      tos: false
+    };
     this.logOut = this.logOut.bind(this);
     const path = this.props.history.location.pathname;
     this.savePath(path);
     this.savePath = this.savePath.bind(this);
+    this.signUp = this.signUp.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.setTerms = this.setTerms.bind(this);
   }
 
   savePath(path) {
-
     if (
       path === '/tools' ||
       path === '/sports' ||
@@ -41,8 +48,51 @@ class Header extends Component {
     this.props.logoutAction();
   }
 
+  signUp(e) {
+    e.preventDefault();
+    const { email, tos } = this.state;
+    const filter = /^[\w\-.+]+@[a-zA-Z0-9.-]+\.[a-zA-z0-9]{2,4}$/;
+    this.setState({
+      error: ''
+    });
+    if (!email || !filter.test(email)) {
+      this.setState({
+        error: 'Please enter a valid email'
+      });
+      return;
+    }
+    if (!tos) {
+      this.setState({
+        error: 'Please accept the terms and condition'
+      });
+      return;
+    }
+    this.props.registerUser({ email }).then((res) => {
+      if (res) {
+        window.location.href = '/dashboard';
+      } else {
+        this.setState({
+          error: 'Registration failed. Please try again.'
+        });
+      }
+    });
+  }
+
+  setTerms() {
+    this.setState({
+      tos: !this.state.tos
+    });
+  }
+
+  onChange(e) {
+    this.setState({
+      [e.target.name]: e.target.value
+    });
+  }
+
   render() {
     const { user, isAuthenticated } = this.props.auth;
+    const { email, tos, error } = this.state;
     return (
       <div>
         <section id="top">
@@ -104,23 +154,39 @@ class Header extends Component {
                         {/* <!-- Modal body --> */}
                         <div className="modal-body">
                           <div className="text-center login-form">
-                            <div className="error" id="errorDiv" />
+                            {error && (
+                              <div className="error">{error}</div>
+                            )}
                             <div className="success" id="successDiv" />
                             <form>
                               <div className="form-group">
                                 <label htmlFor="email">Enter Your Email Address</label>
-                                <input type="email" className="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter Email and Password will be Sent" />
+                                <input
+                                  type="email"
+                                  className="form-control"
+                                  name="email"
+                                  aria-describedby="emailHelp"
+                                  placeholder="Enter Email and Password will be Sent"
+                                  value={email}
+                                  onChange={this.onChange}
+                                />
                               </div>
                               <div className="form-check">
                                 <label className="form-check-label">
-                                  <input className="form-check-input" id="tos" type="checkbox" />> I agree with the
+                                  <input
+                                    className="form-check-input"
+                                    name="tos"
+                                    type="checkbox"
+                                    value={tos}
+                                    onChange={this.setTerms}
+                                  /> I agree with the
                                   <a href="/tos">
                                     <u>Terms of Service</u>
                                   </a>.
                                 </label>
                               </div>
                               <div className="text-center but-div">
-                                <button id="registerBtn" className="cmn-btn">Create Account</button>
+                                <button onClick={this.signUp} id="registerBtn" className="cmn-btn">Create Account</button>
                               </div>
                             </form>
 
@@ -207,4 +273,6 @@ const mapStateToProps = state => ({
   pageInfo: state.pageInfo
 });
 
-export default connect(mapStateToProps, { logoutAction, saveCurrent, saveSub })(withRouter(Header));
+export default connect(mapStateToProps, {
+  logoutAction, saveCurrent, saveSub, registerUser
+})(withRouter(Header));

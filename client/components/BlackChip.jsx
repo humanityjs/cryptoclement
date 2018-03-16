@@ -8,7 +8,8 @@ class BlackChip extends Component {
     super(props);
     this.state = {
       username: '',
-      email: ''
+      email: '',
+      error: ''
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -65,6 +66,12 @@ class BlackChip extends Component {
           }
         });
     } else {
+      if (!this.state.username) {
+        this.setState({
+          error: 'Please enter your username'
+        });
+        return;
+      }
       this.props
         .addSite({
           email: this.props.auth.user.email,
@@ -93,6 +100,7 @@ class BlackChip extends Component {
   }
   render() {
     const { isAuthenticated } = this.props.auth;
+    const { error } = this.state;
     return (
       <section id="main" className="sec-pad poker">
         <div className="container">
@@ -138,6 +146,9 @@ class BlackChip extends Component {
             <div className="col-md-4 step-3">
               <h4>Step 3 </h4>
               <p>Verify Your blackChip Poker Username </p>
+              {error && (
+                <div className="error">{error}</div>
+              )}
               <input
                 id="signupUsername"
                 type="text"
@@ -176,15 +187,15 @@ class BlackChip extends Component {
                 </div>
               ) : (
                 <div className="but-div">
-                  <button
-                    id="signupButton"
-                    onClick={e => this.onSubmit(e, 'old')}
-                    className="cmn-btn"
-                  >
-                    Add site
-                  </button>
-                </div>
-              )}
+                    <button
+                      id="signupButton"
+                      onClick={e => this.onSubmit(e, 'old')}
+                      className="cmn-btn"
+                    >
+                      Add site
+                    </button>
+                  </div>
+                )}
             </div>
           </div>
         </div>

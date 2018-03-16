@@ -20,6 +20,10 @@ const addNewUserToState = user => ({
   user
 });
 
+// const registerUserAction = user => ({
+//   type:
+// });
+
 const addSingleUserToState = user => ({
   type: GET_USER_DETAILS,
   user
@@ -63,6 +67,16 @@ export function getAllUsers() {
         console.log(response);
       }
     );
+}
+
+export function registerUser(user) {
+  return dispatch =>
+    axios.post('/api/users/', user)
+      .then(({ data }) => {
+        console.log(data);
+        processLogin(data.token, dispatch);
+        return true;
+      }, () => false);
 }
 
 /**

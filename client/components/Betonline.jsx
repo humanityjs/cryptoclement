@@ -8,7 +8,8 @@ class Betonline extends Component {
     super(props);
     this.state = {
       username: '',
-      email: ''
+      email: '',
+      error: ''
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -65,6 +66,12 @@ class Betonline extends Component {
           }
         });
     } else {
+      if (!this.state.username) {
+        this.setState({
+          error: 'Please enter your username'
+        });
+        return;
+      }
       this.props
         .addSite({
           email: this.props.auth.user.email,
@@ -93,6 +100,7 @@ class Betonline extends Component {
   }
   render() {
     const { isAuthenticated } = this.props.auth;
+    const { error } = this.state;
     return (
       <section id="main" className="sec-pad poker">
         <div className="container">
@@ -133,6 +141,9 @@ class Betonline extends Component {
             <div className="col-md-4 step-3">
               <h4>Step 3 </h4>
               <p>Verify Your Betonline Username </p>
+              {error && (
+                <div className="error">{error}</div>
+              )}
               <input
                 id="signupUsername"
                 type="text"
@@ -170,14 +181,14 @@ class Betonline extends Component {
                   </div>
                 </div>
               ) : (
-                  <div className="but-div">
+                <div className="but-div">
                     <button
                       id="signupButton"
                       onClick={e => this.onSubmit(e, 'old')}
                       className="cmn-btn"
                     >
                       Add site
-                  </button>
+                    </button>
                   </div>
                 )}
             </div>

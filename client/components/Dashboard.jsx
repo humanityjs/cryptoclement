@@ -337,7 +337,7 @@ class Dashboard extends Component {
 
   render() {
     const { user } = this.props;
-    const { conversionRate, amountToConvert } = this.state;
+    const { conversionRate, amountToConvert, error } = this.state;
     const converted = (amountToConvert * conversionRate) - ((1 / 100) * (amountToConvert * conversionRate));
     return (
       <section id="main" className="sec-pad poker">
@@ -431,7 +431,9 @@ class Dashboard extends Component {
                       </div>
                       <div className="convert">
                         <h5>CONVERT TO CRYPTOCURRENCY</h5>
-                        <div id="exchangeError" />
+                        {error && (
+                          <div className="error">{error}</div>
+                        )}
                         <div className="form-group">
                           <label
                             className="small"
@@ -490,7 +492,9 @@ class Dashboard extends Component {
                     <div className="flex-second">
                       <div className="address">
                         <h5>CASHOUT</h5>
-                        <div id="cashOutError" />
+                        {error && (
+                          <div className="error">{error}</div>
+                        )}
                         <div className="form-group">
                           <label className="small" htmlFor="cashOutCrypto">
                             Select cryptocurrency
