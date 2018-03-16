@@ -1,7 +1,7 @@
 /*
 * ----------------------------------------------------------------------------------------***
 Author       : MostakinMithun
-Template Name: Tulsi - Business Template 
+Template Name: Tulsi - Business Template
 Version      : 1.0
 * ----------------------------------------------------------------------------------------***
 */
@@ -672,6 +672,10 @@ input[type=checkbox] {
   padding: 10px;
   background-color: #fff;
   margin-bottom: 20px;
+}
+
+.address {
+  margin-top: 50px;
 }
 
 .balance h5,

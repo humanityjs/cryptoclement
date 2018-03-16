@@ -1,11 +1,17 @@
 import { GET_USER_DETAILS, GET_ALL_USERS } from '../constants/actionType';
 
 const initialState = {
-  user: {
-    contracts: []
+  user: {},
+  earnings: {
+    usd: 0,
+    btc: 0,
+    eth: 0,
+    ltc: 0,
+    dash: 0,
+    bch: 0
   },
-  contractSum: 0,
-  earningsTotal: 0,
+  sites: [],
+  histories: [],
   users: []
 };
 

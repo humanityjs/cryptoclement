@@ -69,7 +69,7 @@ class AuthContainer extends Component {
           <Route
             exact
             path={path}
-            render={() => <SideBarComponent component={<Comp />} />}
+            render={() => <Comp />}
           />
         );
       }
@@ -77,7 +77,7 @@ class AuthContainer extends Component {
         <Route
           exact
           path={path}
-          render={() => <SideBarComponent component={<Comp />} />}
+          render={() => <Comp />}
         />
       );
     }

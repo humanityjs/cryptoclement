@@ -13,3 +13,4 @@ export const GET_ALL_TYPES = 'GET_ALL_TYPES';
 export const GET_USER_DETAILS = 'GET_USER_DETAILS';
 export const SET_CURRENT_PAGE = 'SET_CURRENT_PAGE';
 export const SET_CURRENT_SUBPAGE = 'SET_CURRENT_SUBPAGE';
+export const GET_ADMIN = 'GET_ADMIN';

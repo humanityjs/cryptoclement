@@ -9,7 +9,7 @@ import swal from 'sweetalert2';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 import logoutAction from '../actions/logoutAction';
-import { getSingleUser, deleteStore, getAllUsers } from '../actions/userAction';
+import { getAdmin, getAllUsers, creditUser } from '../actions/userAction';
 
 /**
  * Dashboard component
@@ -25,39 +25,22 @@ class Admin extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: this.props.auth.user,
-      details: this.props.user,
-      loading: true,
-      allContracts: [],
-      allContractSum: 0,
-      totalEarnings: 0,
-      allEarnings: [],
-      username: '',
-      email: '',
-      fname: '',
-      lname: '',
-      streetAddress: '',
-      btcAddress: '',
-      roledId: '',
-      password: '',
-      errors: {},
-      startDateCa: moment(),
-      startDate: '',
-      userUUID: '',
-      value: '',
-      earningDate: moment(),
-      th: '',
-      todayEarnings: ''
+      earnUsername: '',
+      earnAmount: '',
+      earnEmail: '',
+      earnSite: '',
+      earnSitename: '',
+      earnType: '',
+      error: ''
     };
-    this.logOut = this.logOut.bind(this);
+    this.payouts = this.payouts.bind(this);
+    this.sites = this.sites.bind(this);
+    this.status = this.status.bind(this);
     this.onChange = this.onChange.bind(this);
-    this.onUserSubmit = this.onUserSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleEarningChange = this.handleEarningChange.bind(this);
-    this.getOptions = this.getOptions.bind(this);
-    this.selectOptionChange = this.selectOptionChange.bind(this);
-    this.onContractSubmit = this.onContractSubmit.bind(this);
-    this.onEarningSubmit = this.onEarningSubmit.bind(this);
+    this.earnSubmit = this.earnSubmit.bind(this);
+    this.confirmPayment = this.confirmPayment.bind(this);
+    this.verifySite = this.verifySite.bind(this);
+    this.users = this.users.bind(this);
   }
 
   /**
@@ -67,21 +50,8 @@ class Admin extends Component {
    * @memberOf Dashboard
    */
   componentDidMount() {
-    this.props.getSingleUser(this.state.user.uuid).then(() => {
-      this.props.getAllUsers();
-      axios.get('/api/contracts').then(({ data }) => {
-        this.setState({
-          allContractSum: data.contractSum,
-          allContracts: data.contracts.rows
-        });
-      });
-      axios.get('/api/earnings').then(({ data }) => {
-        this.setState({
-          totalEarnings: data.totalEarnings,
-          allEarnings: data.earnings.rows
-        });
-      });
-    });
+    this.props.getAdmin();
+    this.props.getAllUsers();
   }
 
   /**
@@ -98,19 +68,6 @@ class Admin extends Component {
     });
   }
 
-  handleChange(date) {
-    this.setState({
-      startDateCa: date,
-      startDate: date
-    });
-  }
-
-  handleEarningChange(date) {
-    this.setState({
-      earningDate: date
-    });
-  }
-
   /**
    * Handles change event
    * @param {any} e
@@ -123,183 +80,224 @@ class Admin extends Component {
     });
   }
 
-  /**
-   * Add new users
-   * @method onUserSubmit
-   * @returns {void}
-   * @memberOf Admin
-   */
-  onUserSubmit() {
-    const data = { ...this.state, passwordConfirmation: this.state.password };
-    this.setState({
-      errors: {}
-    });
-    axios.post('/api/users', data).then(
-      () => {
-        this.props.getAllUsers();
+  confirmPayment(id) {
+    axios.post('/api/admin/confirm-payment', { id })
+      .then(() => {
         swal({
           title: 'Success',
-          html: 'User added successfully!',
+          html: 'Payment Confirmed Successfully',
           type: 'success',
           allowOutsideClick: false
-        }).then(() => {
-          $('#modal-example').modal('hide');
-        });
-      },
-      ({ response }) => {
-        console.log(response.data);
-        this.setState({
-          errors: response.data.errors
-        });
-      }
-    );
-  }
-
-  /**
-   * Fetch names that matches what the user is typing
-   * @param {any} input
-   * @returns {void}
-   * @memberOf Documents
-   */
-  getOptions(input) {
-    return axios.get(`/api/users/search?q=${input}`).then(({ data }) => {
-      const options = data.map(user => ({
-        value: user.uuid,
-        label: `${user.fname} ${user.lname} - ${user.username}`
-      }));
-      return { options };
-    });
-  }
-
-  /**
-   * Set the student's name to state on change
-   * @param {any} val
-   * @returns {void}
-   * @memberOf Documents
-   */
-  selectOptionChange(val) {
-    this.setState({
-      userUUID: val.value //
-    });
-  }
-
-  onContractSubmit(e) {
-    e.preventDefault();
-    axios.post('/api/contracts', this.state).then(
-      () => {
-        this.setState({
-          userUUID: '',
-          value: '',
-          startDateCa: moment()
-        });
-        axios.get('/api/contracts').then(({ data }) => {
-          this.setState({
-            allContractSum: data.contractSum,
-            allContracts: data.contracts.rows
+        })
+          .then(() => {
+            this.props.getAdmin();
           });
+      }, (({ response }) => {
           swal({
-            title: 'Success',
-            html: 'Contract added successfully!',
-            type: 'success',
+            title: 'Error',
+            html: response.data.message,
+            type: 'error',
             allowOutsideClick: false
-          }).then(() => {
-            $('#contract-modal').modal('hide');
           });
-        });
-      },
-      ({ response }) => {
-        console.table(response);
-      }
-    );
+        }));
   }
 
-  onEarningSubmit(e) {
-    e.preventDefault();
-    const data = {
-      earnings: this.state.todayEarnings,
-      th: this.state.th,
-      eDate: this.state.earningDate
-    };
+  verifySite(id, status) {
+    axios.post('/api/admin/confirm-site', { id, status })
+      .then(() => {
+        swal({
+          title: 'Success',
+          html: 'Site confirmed successfully!',
+          type: 'success',
+          allowOutsideClick: false
+        })
+          .then(() => {
+            this.props.getAdmin();
+          });
+      }, (({ response }) => {
+          swal({
+            title: 'Error',
+            html: response.data.message,
+            type: 'error',
+            allowOutsideClick: false
+          });
+        }));
+  }
 
-    if (!data.earnings || !data.th) {
-      swal({
-        title: 'Error',
-        text: 'Please fill all the fields',
-        type: 'error',
-        allowOutsideClick: false
-      });
+  payouts() {
+    let Payout;
+    const { payouts } = this.props.admin;
+    if (payouts.length > 0) {
+      Payout = payouts.map((payout, i) => (
+        <tr key={i}>
+          <td>{payout.email}</td>
+          <td>{payout.amount}</td>
+          <td>{payout.type.toUpperCase()}</td>
+          <td>{payout.address}</td>
+          <td>{payout.status === 0 ? 'pending' : 'paid'}</td>
+          <td>
+            <button
+              onClick={() => this.confirmPayment(payout.id)}
+              className="cmn-btn confirm"
+              disabled={payout.status === 1}
+            >
+              {payout.status === 1 ? 'Confirmed' : 'Confirm'}
+            </button>
+          </td>
+        </tr>
+      ));
     } else {
-      swal({
-        title: 'Confirm Date',
-        text: `Add earnings for ${moment(data.eDate).format('YYYY-MM-DD')} @ ${
-          data.th
-        } TH/s`,
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes',
-        cancelButtonText: 'No',
-        allowOutsideClick: false
-      }).then((result) => {
-        if (result.value) {
-          axios.post('/api/earnings', data).then(
-            () => {
-              this.setState({
-                earnings: '',
-                th: '',
-                earningDate: moment()
-              });
-              axios.get('/api/earnings').then(({ data }) => {
-                this.setState({
-                  totalEarnings: data.totalEarnings,
-                  allEarnings: data.earnings.rows
-                });
-                swal({
-                  title: 'Success',
-                  html: 'Earning added successfully!',
-                  type: 'success',
-                  allowOutsideClick: false
-                }).then(() => {
-                  $('#earnings-modal').modal('hide');
-                });
-              });
-            },
-            ({ response }) => {
-              const errors = response.data.errors;
-              let html;
-              if (errors && errors.earnings && errors.th) {
-                html = `${errors.earnings} <br /> ${errors.th}`;
-              } else if (errors && errors.earnings && !errors.th) {
-                html = `${errors.earnings}`;
-              } else if (errors && !errors.earnings && errors.th) {
-                html = `${errors.th}`;
-              } else {
-                html = `${response.data.message}`;
-              }
-              swal({
-                title: 'Error',
-                html,
-                type: 'error',
-                allowOutsideClick: false
-              });
-            }
-          );
-        }
-      });
+      Payout = (
+        <tr>
+          <td colSpan="6" style={{ textAlign: 'center' }}>
+            No payout requests at this time.
+          </td>
+        </tr>
+      );
+    }
+
+    return Payout;
+  }
+
+  users() {
+    let User;
+    const { users } = this.props.user;
+    if (users.length > 0) {
+      User = users.map((user, i) => (
+        <tr key={i}>
+          <td>{user.email}</td>
+          <td>{user.role === 1 ? 'Admin' : 'Regular User'}</td>
+        </tr>
+      ));
+    } else {
+      User = (
+        <tr>
+          <td colSpan="2" style={{ textAlign: 'center' }}>
+            No user to display
+          </td>
+        </tr>
+      );
+    }
+
+    return User;
+  }
+
+  status(num) {
+    switch (num) {
+      case 0:
+        return <i className="material-icons">timer</i>;
+      case 1:
+        return <i className="material-icons">check</i>;
+      default:
+        return <i className="material-icons">close</i>;
     }
   }
 
-  /**
-   * Logs a user out
-   * @param {any} e
-   * @returns {void}
-   * @memberOf Dashboard
-   */
-  logOut(e) {
+  sites() {
+    let Site;
+    const { sites } = this.props.admin;
+    if (sites.length > 0) {
+      Site = sites.map((site, i) => (
+        <tr key={i}>
+          <td>{site.site_name}</td>
+          <td>
+            {site.username} &nbsp;
+            {this.status(site.status)}
+          </td>
+          <td>{site.email}</td>
+          <td>
+            {site.status === 0 ? (
+              <span>
+                <button
+                  onClick={() => this.verifySite(site.id, 1)}
+                  className="cmn-btn"
+                >
+                  Valid
+                </button>
+                <button
+                  className="cmn-btn"
+                  style={{ backgroundColor: 'red' }}
+                  onClick={() => this.verifySite(site.id, 2)}
+                >
+                  Invalid
+                </button>
+              </span>
+            ) : (
+              <button id="submit" disabled>
+                  Verified
+                </button>
+              )}
+          </td>
+        </tr>
+      ));
+    } else {
+      Site = (
+        <tr>
+          <td colSpan="4" style={{ textAlign: 'center' }}>
+            No registered Sites yet.
+          </td>
+        </tr>
+      );
+    }
+
+    return Site;
+  }
+
+  earnSubmit(e) {
     e.preventDefault();
-    this.props.deleteStore();
-    this.props.logoutAction();
+    this.setState({
+      error: ''
+    });
+    const {
+      earnAmount,
+      earnEmail,
+      earnSite,
+      earnSitename,
+      earnType,
+      earnUsername
+    } = this.state;
+    if (
+      !earnAmount ||
+      !earnEmail ||
+      !earnSite ||
+      !earnSitename ||
+      !earnType ||
+      !earnUsername
+    ) {
+      this.setState({
+        error: 'Please fill all fields'
+      });
+      return;
+    }
+    this.props
+      .creditUser({
+        amount: earnAmount,
+        email: earnEmail,
+        siteName: earnSite,
+        siteType: earnSitename,
+        type: earnType,
+        username: earnUsername
+      })
+      .then((res) => {
+        if (res) {
+          swal({
+            title: 'Success',
+            html: 'User credited successfully!',
+            type: 'success',
+            allowOutsideClick: false
+          }).then(() => {
+            this.setState({
+              earnUsername: '',
+              earnAmount: '',
+              earnEmail: '',
+              earnSite: '',
+              earnSitename: '',
+              earnType: '',
+              error: ''
+            });
+          });
+        }
+      });
   }
 
   /**
@@ -309,399 +307,263 @@ class Admin extends Component {
    * @memberOf Dashboard
    */
   render() {
-    const { users } = this.state.details;
-    const {
-      allContractSum, allContracts, totalEarnings, errors
-    } = this.state;
-
-    const trimamount = amount =>
-      amount
-        .toString()
-        .split('')
-        .slice(0, 12)
-        .join('');
-
     return (
-      <div>
-        <div className="uk-container uk-container-small uk-position-relative p0">
-          <section id="1" className="b-main">
-            <div className="uk-section uk-section-default">
-              <div className="uk-container">
-                <h3 className="ml-15 bb">OVERVIEW</h3>
-
+      <section id="main" className="sec-pad poker">
+        <div className="container">
+          <div className="row">
+            <div className="d-flex flex-row mt-2">
+              <ul
+                className="nav nav-tabs nav-tabs--vertical nav-tabs--left"
+                role="navigation"
+              >
+                <li className="nav-item">
+                  <a
+                    href="#lorem"
+                    className="nav-link active"
+                    data-toggle="tab"
+                    role="tab"
+                    aria-controls="lorem"
+                  >
+                    EARNINGS
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    href="#ipsum"
+                    className="nav-link"
+                    data-toggle="tab"
+                    role="tab"
+                    aria-controls="ipsum"
+                  >
+                    PAYOUTS
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    href="#sit-amet"
+                    className="nav-link"
+                    data-toggle="tab"
+                    role="tab"
+                    aria-controls="sit-amet"
+                  >
+                    SITES
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    href="#users"
+                    className="nav-link"
+                    data-toggle="tab"
+                    role="tab"
+                    aria-controls="sit-amet"
+                  >
+                    USERS
+                  </a>
+                </li>
+              </ul>
+              <div className="tab-content">
                 <div
-                  className="uk-grid-small uk-child-width-1-2@s uk-child-width-1-3@m uk-grid-match"
-                  uk-grid={true.toString()}
+                  className="tab-pane fade show active"
+                  id="lorem"
+                  role="tabpanel"
                 >
-                  <div>
-                    <div className="uk-card uk-flex uk-flex-middle uk-flex-center uk-card-default uk-card-body">
-                      <div>
-                        <h3 className="uk-card-title">TOTAL USERS</h3>
-                        <p>{users.length}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="uk-card uk-flex uk-flex-middle uk-flex-center uk-card-primary uk-card-body">
-                      <div>
-                        <h3 className="uk-card-title">ALL CONTRACTS</h3>
-                        <p>{allContracts.length}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="uk-card uk-flex uk-flex-middle uk-flex-center uk-card-secondary uk-card-body">
-                      <div>
-                        <h3 className="uk-card-title">CONTRACTS HASHRATE</h3>
-                        <p>{trimamount(allContractSum)}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="uk-card uk-flex uk-flex-middle uk-flex-center uk-card-primary uk-card-body">
-                      <div>
-                        <h3 className="uk-card-title">TOTAL EARNINGS</h3>
-                        <p>{trimamount(totalEarnings)}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="uk-card uk-flex uk-flex-middle uk-flex-center uk-card-secondary uk-card-body">
-                      <div>
-                        <h3 className="uk-card-title">PAYOUTS</h3>
-                        <p>0</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="uk-card uk-flex uk-flex-middle uk-flex-center uk-card-default uk-card-body">
-                      <div>
-                        <h3 className="uk-card-title">PENDING PAYOUTS</h3>
-                        <p>0</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section id="2" className="b-main">
-            <div className="uk-section uk-section-primary uk-light">
-              <div className="uk-container">
-                <h3 className="bbw">ACTIONS</h3>
-                <div
-                  className="uk-grid-small uk-child-width-1-3@s uk-grid-match"
-                  uk-grid={true.toString()}
-                >
-                  <div>
-                    <button
-                      className="uk-button uk-button-default uk-margin-small-right"
-                      type="button"
-                      uk-toggle="target: #modal-example"
-                    >
-                      Add User
-                    </button>
-                  </div>
-                  <div>
-                    <button
-                      className="uk-button uk-button-default uk-margin-small-right"
-                      type="button"
-                      uk-toggle="target: #contract-modal"
-                    >
-                      Add Contract
-                    </button>
-                  </div>
-                  <div>
-                    <button
-                      className="uk-button uk-button-default uk-margin-small-right"
-                      type="button"
-                      uk-toggle="target: #earnings-modal"
-                    >
-                      Add Earnings
-                    </button>
-                  </div>
-                </div>
-              </div>
-              {/* Modal 1 */}
-              <div id="modal-example" uk-modal={true.toString()}>
-                <div className="uk-modal-dialog uk-modal-body uk-flex uk-flex-center uk-flex-middle">
-                  <div className="center">
-                    <div className="center">
-                      <h3>Add new user</h3>
-
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
+                  <div className="flex">
+                    <div className="flex-first">
+                      <div className="convert">
+                        <h5>CREDIT USER</h5>
+                        <div id="earnError" />
+                        <div className="form-group">
+                          <label className="small" htmlFor="earnUsername">
+                            Enter Username
+                          </label>
                           <input
-                            name="fname"
-                            value={this.state.fname}
                             onChange={this.onChange}
-                            className="uk-input"
+                            value={this.state.earnUsername}
                             type="text"
-                            placeholder="First Name"
+                            className="form-control"
+                            name="earnUsername"
+                            aria-describedby="earnUsername"
+                            placeholder="Enter Username"
                           />
                         </div>
-                        <span>{errors.fname && errors.fname}</span>
-                      </div>
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
+                        <div className="form-group">
+                          <label className="small" htmlFor="earnEmail">
+                            Enter User Email
+                          </label>
                           <input
-                            name="lname"
-                            value={this.state.lname}
                             onChange={this.onChange}
-                            className="uk-input"
+                            value={this.state.earnEmail}
                             type="text"
-                            placeholder="Last Name"
+                            className="form-control"
+                            name="earnEmail"
+                            aria-describedby="earnUsername"
+                            placeholder="Enter Email"
                           />
                         </div>
-                        <span>{errors.lname && errors.lname}</span>
-                      </div>
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
-                          <input
-                            name="email"
-                            value={this.state.email}
-                            onChange={this.onChange}
-                            className="uk-input"
-                            type="text"
-                            placeholder="Email"
-                          />
-                        </div>
-                        <span>{errors.email && errors.email}</span>
-                      </div>
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
-                          <input
-                            name="streetAddress"
-                            value={this.state.streetAddress}
-                            onChange={this.onChange}
-                            className="uk-input"
-                            type="text"
-                            placeholder="Street Address"
-                          />
-                        </div>
-                        <span>
-                          {errors.streetAddress && errors.streetAddress}
-                        </span>
-                      </div>
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
-                          <input
-                            name="btcAddress"
-                            value={this.state.btcAddress}
-                            onChange={this.onChange}
-                            className="uk-input"
-                            type="text"
-                            placeholder="Bitcoin Address"
-                          />
-                        </div>
-                        {errors.btcAddress && errors.btcAddress}
-                      </div>
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
-                          <input
-                            name="username"
-                            value={this.state.username}
-                            onChange={this.onChange}
-                            className="uk-input"
-                            type="text"
-                            placeholder="Username"
-                          />
-                        </div>
-                        <span>{errors.username && errors.username}</span>
-                      </div>
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
-                          <input
-                            name="password"
-                            value={this.state.password}
-                            onChange={this.onChange}
-                            className="uk-input"
-                            type="password"
-                            placeholder="Password"
-                          />
-                        </div>
-                        <span>{errors.password && errors.password}</span>
-                      </div>
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
+                        <div className="form-group">
+                          <label className="small" htmlFor="earnSite">
+                            Select Site
+                          </label>
                           <select
-                            className="uk-select"
                             onChange={this.onChange}
-                            name="roleId"
+                            value={this.state.earnSite}
+                            className="form-control"
+                            name="earnSite"
+                            id="earnSite"
                           >
-                            <option>Please select role</option>
-                            <option value="1">Admin</option>
-                            <option value="2">Regular</option>
+                            <option value="">Please select</option>
+                            <option value="sports">Sports</option>
+                            <option value="tools">Tools</option>
+                            <option value="trading">Trading</option>
+                            <option value="poker">Poker</option>
                           </select>
                         </div>
-                        <span>{errors.roledId && errors.roledId}</span>
-                      </div>
-                    </div>
-                    <p className="uk-text-right">
-                      <button
-                        className="uk-button uk-button-default uk-modal-close"
-                        type="button"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="uk-button uk-button-primary"
-                        type="button"
-                        onClick={this.onUserSubmit}
-                      >
-                        Save
-                      </button>
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal 2 */}
-              <div id="contract-modal" uk-modal={true.toString()}>
-                <div className="uk-modal-dialog uk-modal-body uk-flex uk-flex-center uk-flex-middle">
-                  <div className="center">
-                    <div className="center">
-                      <h3>Add new contract</h3>
-
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
-                          <Select.Async
-                            name="form-field-name"
-                            value={this.state.userUUID}
-                            onChange={this.selectOptionChange}
-                            loadOptions={this.getOptions}
-                          />
-                        </div>
-                        <span>{errors.fname && errors.fname}</span>
-                      </div>
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
-                          <input
-                            name="value"
-                            value={this.state.value}
+                        <div className="form-group">
+                          <label className="small" htmlFor="earnSitename">
+                            Select Sitename
+                          </label>
+                          <select
                             onChange={this.onChange}
-                            className="uk-input"
+                            value={this.state.earnSitename}
+                            className="form-control"
+                            name="earnSitename"
+                            id="earnSitename"
+                          >
+                            <option value="">Please select</option>
+                            <option value="americas-cardroom">
+                              Americas Cardroom
+                            </option>
+                            <option value="betonline">Betonline</option>
+                            <option value="blackchip-poker">
+                              BlackChip poker
+                            </option>
+                            <option value="intertoops">Intertoops</option>
+                            <option value="nitogensports">
+                              Nitrogen Sports
+                            </option>
+                            <option value="swc">SWC</option>
+                          </select>
+                        </div>
+
+                        <div className="form-group">
+                          <label className="small" htmlFor="earnAmount">
+                            Enter Amount
+                          </label>
+                          <input
+                            onChange={this.onChange}
+                            value={this.state.earnAmount}
                             type="number"
-                            placeholder="Value"
+                            className="form-control"
+                            name="earnAmount"
+                            aria-describedby="earnAmount"
+                            placeholder="Enter Amount"
                           />
                         </div>
-                        <span>{errors.value && errors.value}</span>
-                      </div>
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
-                          <DatePicker
-                            selected={this.state.startDateCa}
-                            onChange={this.handleChange}
-                            className="uk-input"
-                          />
+
+                        <div className="form-group">
+                          <label className="small" htmlFor="earnType">
+                            Select currency
+                          </label>
+                          <select
+                            onChange={this.onChange}
+                            value={this.state.earnType}
+                            className="form-control"
+                            name="earnType"
+                            id="earnType"
+                          >
+                            <option value="">Please select</option>
+                            <option value="USD">USD</option>
+                            <option value="BTC">BTC</option>
+                            <option value="ETH">ETH</option>
+                            <option value="BCH">BCH</option>
+                            <option value="LTC">LTC</option>
+                            <option value="DASH">DASH</option>
+                          </select>
+                        </div>
+                        <div className="form-group">
+                          <button onClick={this.earnSubmit} className="cmn-btn">
+                            CREDIT USER
+                          </button>
                         </div>
                       </div>
                     </div>
-                    <p className="uk-text-right">
-                      <button
-                        className="uk-button uk-button-default uk-modal-close"
-                        type="button"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="uk-button uk-button-primary"
-                        type="button"
-                        onClick={this.onContractSubmit}
-                      >
-                        Save
-                      </button>
-                    </p>
+
+                    <div className="flex-second" />
                   </div>
                 </div>
-              </div>
 
-              {/* Modal 3 */}
-              <div id="earnings-modal" uk-modal={true.toString()}>
-                <div className="uk-modal-dialog uk-modal-body uk-flex uk-flex-center uk-flex-middle">
-                  <div className="center">
-                    <div className="center">
-                      <h3>Add earnings</h3>
-
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
-                          <input
-                            name="todayEarnings"
-                            value={this.state.todayEarnings}
-                            onChange={this.onChange}
-                            className="uk-input"
-                            type="text"
-                            placeholder="Earnings"
-                          />
-                        </div>
-                        <span>{errors.earnings && errors.earnings}</span>
-                      </div>
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
-                          <input
-                            name="th"
-                            value={this.state.th}
-                            onChange={this.onChange}
-                            className="uk-input"
-                            type="text"
-                            placeholder="Hash Rate"
-                          />
-                        </div>
-                        <span>{errors.value && errors.value}</span>
-                      </div>
-                      <div className="uk-margin">
-                        <div className="uk-inline">
-                          <span className="uk-form-icon" uk-icon="icon: user" />
-                          <DatePicker
-                            selected={this.state.earningDate}
-                            onChange={this.handleEarningChange}
-                            className="uk-input"
-                          />
-                        </div>
-                      </div>
+                {/* <!-- 2nd --> */}
+                <div className="tab-pane fade" id="ipsum" role="tabpanel">
+                  <div className="history">
+                    <h5>PAYOUT REQUESTS</h5>
+                    <div className="history-list">
+                      <p>Pocker</p>
+                      <table className="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>EMAIL</th>
+                            <th>AMOUNT</th>
+                            <th>CURRENCY</th>
+                            <th>ADDRESS</th>
+                            <th>STATUS</th>
+                            <th>ACTIONS</th>
+                          </tr>
+                        </thead>
+                        <tbody>{this.payouts()}</tbody>
+                      </table>
                     </div>
-                    <p className="uk-text-right">
-                      <button
-                        className="uk-button uk-button-default uk-modal-close"
-                        type="button"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="uk-button uk-button-primary"
-                        type="button"
-                        onClick={this.onEarningSubmit}
-                      >
-                        Save
-                      </button>
-                    </p>
+                  </div>
+                </div>
+
+                {/* <!-- 3rd --> */}
+                <div className="tab-pane fade" id="sit-amet" role="tabpanel">
+                  <div className="history">
+                    <h5>HISTORY</h5>
+                    <div className="history-list">
+                      <table className="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>SITES</th>
+                            <th>USERNAME</th>
+                            <th>EMAIL</th>
+                            <th>ACTIONS</th>
+                          </tr>
+                        </thead>
+                        <tbody>{this.sites()}</tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* <!-- 4th --> */}
+                <div className="tab-pane fade" id="users" role="tabpanel">
+                  <div className="history">
+                    <h5>USERS</h5>
+                    <div className="history-list">
+                      <table className="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>EMAIL</th>
+                            <th>ROLE</th>
+                          </tr>
+                        </thead>
+                        <tbody>{this.users()}</tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </section>
+          </div>
         </div>
-      </div>
+      </section>
     );
   }
 }
 
 const mapStateToProps = state => ({
   auth: state.auth,
+  admin: state.admin,
   user: state.user
 });
 
@@ -715,7 +577,7 @@ Admin.propTypes = {
 
 export default connect(mapStateToProps, {
   logoutAction,
-  getSingleUser,
-  deleteStore,
-  getAllUsers
+  getAdmin,
+  getAllUsers,
+  creditUser
 })(Admin);

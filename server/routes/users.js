@@ -70,9 +70,9 @@ router.post('/', (req, res) => {
             {
               uuid: newUser.uuid,
               roleId: newUser.role,
-              email: newUser.email,
+              email: newUser.email
             },
-            config.jwtSecret,
+            config.jwtSecret
           );
 
           return res.status(200).send({
@@ -118,91 +118,94 @@ router.post('/site', authUserMiddleware, (req, res) => {
   } = req.body;
   const id = uuidV1();
   Site.findOne({
-    email, username, site_name: siteName, site_type: siteType
-  })
-    .then((site) => {
-      if (!site) {
-        User.findOne({ email })
-          .then((user) => {
-            if (!user) {
-              const password = generator.generate({
-                length: 10,
-                numbers: true
-              });
-              const hashedPassword = bcrypt.hashSync(password);
-              User.create({
-                email,
-                password: hashedPassword
-              }).then((newUser) => {
-                Site.create({
-                  id,
-                  email,
-                  username,
-                  site_type: siteType,
-                  site_name: siteName
-                })
-                  .then(() => {
-                    const message = `<h4>Hi there</h4>
+    email,
+    username,
+    site_name: siteName,
+    site_type: siteType
+  }).then((site) => {
+    if (!site) {
+      User.findOne({ email }).then((user) => {
+        if (!user) {
+          const password = generator.generate({
+            length: 10,
+            numbers: true
+          });
+          const hashedPassword = bcrypt.hashSync(password);
+          User.create({
+            email,
+            password: hashedPassword
+          }).then((newUser) => {
+            Site.create({
+              id,
+              email,
+              username,
+              site_type: siteType,
+              site_name: siteName
+            }).then(() => {
+              const message = `<h4>Hi there</h4>
                       <p>Welcome to BTC Grinders.</p>
                       <p>Here is your password for future reference: ${password}.</p>
                       <p>Thank you!</p>
                     `;
-                    const fromEmail = new helper.Email('no-reply@btcgrinders.com');
-                    const toEmail = new helper.Email(email);
-                    const subject = 'Welcome to BTC Grinders';
-                    const content = new helper.Content('text/html', message);
-                    const mail = new helper.Mail(fromEmail, subject, toEmail, content);
-                    const request = sg.emptyRequest({
-                      method: 'POST',
-                      path: '/v3/mail/send',
-                      body: mail.toJSON()
-                    });
-
-                    sg.API(request, (error) => {
-                      if (error) {
-                        return res.status(400).send({
-                          error
-                        });
-                      }
-                      const token = jwt.sign(
-                        {
-                          uuid: newUser.uuid,
-                          roleId: newUser.role,
-                          email: newUser.email,
-                        },
-                        config.jwtSecret,
-                      );
-
-                      return res.status(200).send({
-                        message: 'User added successfully',
-                        token,
-                        type: 'new'
-                      });
-                    });
-                  });
+              const fromEmail = new helper.Email('no-reply@btcgrinders.com');
+              const toEmail = new helper.Email(email);
+              const subject = 'Welcome to BTC Grinders';
+              const content = new helper.Content('text/html', message);
+              const mail = new helper.Mail(
+                fromEmail,
+                subject,
+                toEmail,
+                content
+              );
+              const request = sg.emptyRequest({
+                method: 'POST',
+                path: '/v3/mail/send',
+                body: mail.toJSON()
               });
-            } else {
-              Site.create({
-                id,
-                email,
-                username,
-                site_type: siteType,
-                site_name: siteName
-              })
-                .then(() => res.status(200)
-                  .send({
-                    message: 'Site registered successfully',
-                    type: 'old'
-                  }));
-            }
+
+              sg.API(request, (error) => {
+                if (error) {
+                  return res.status(400).send({
+                    error
+                  });
+                }
+                const token = jwt.sign(
+                  {
+                    uuid: newUser.uuid,
+                    roleId: newUser.role,
+                    email: newUser.email
+                  },
+                  config.jwtSecret
+                );
+
+                return res.status(200).send({
+                  message: 'User added successfully',
+                  token,
+                  type: 'new'
+                });
+              });
+            });
           });
-      } else {
-        return res.status(400)
-          .send({
-            message: 'You have already registered this site on our website'
-          });
-      }
-    });
+        } else {
+          Site.create({
+            id,
+            email,
+            username,
+            site_type: siteType,
+            site_name: siteName
+          }).then(() =>
+            res.status(200).send({
+              message: 'Site registered successfully',
+              type: 'old'
+            }));
+        }
+      });
+    } else {
+      return res.status(400).send({
+        message: 'You have already registered this site on our website'
+      });
+    }
+  });
 });
 
 export default router;

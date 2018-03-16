@@ -15,13 +15,16 @@ class Header extends Component {
   }
 
   savePath(path) {
+
     if (
       path === '/tools' ||
       path === '/sports' ||
-      path === 'poker' ||
+      path === '/poker' ||
       path === '/trading'
     ) {
       this.props.saveCurrent(path.replace('/', ''));
+    } else if (path === '/') {
+      this.props.saveCurrent('poker');
     } else {
       this.props.saveSub(path.replace('/', ''));
     }

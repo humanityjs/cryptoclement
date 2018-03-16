@@ -1,20 +1,21 @@
 import { SET_CURRENT_PAGE, SET_CURRENT_SUBPAGE } from '../constants/actionType';
 
 const initialState = {
-  currentPage: 'poker',
+  currentPage: localStorage.getItem('currentPage') || 'poker',
   subPage: ''
 };
 
 export default (state = initialState, action) => {
   switch (action.type) {
     case SET_CURRENT_PAGE:
+      localStorage.setItem('currentPage', action.currentPage);
       return {
+        ...state,
         currentPage: action.currentPage,
-        subPage: state.subPage
       };
     case SET_CURRENT_SUBPAGE:
       return {
-        currentPage: state.currentPage,
+        ...state,
         subPage: action.subPage
       };
     default:

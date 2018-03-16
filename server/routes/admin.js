@@ -1,6 +1,7 @@
 import express from 'express';
 import Site from '../models/sites';
 import Payout from '../models/payouts';
+import User from '../models/user';
 import authUserMiddleware from './middlewares/authUserMiddleware';
 
 const router = express.Router();
@@ -56,6 +57,17 @@ router.post('/confirm-site', authUserMiddleware, (req, res) => {
       .then(() => res.status(200)
         .send({ message: 'Status updated successfully' }));
   });
+});
+
+router.get('/user', authUserMiddleware, (req, res) => {
+  const { role } = req.authenticatedUser;
+  if (role !== 1) {
+    return res.status(401).send({
+      message: 'You are not authorized to perform this operation'
+    });
+  }
+  User.find().then(users => res.status(200).send({ users }))
+    .catch(err => res.status(400).send({ err }));
 });
 
 export default router;

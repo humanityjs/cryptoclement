@@ -6,7 +6,8 @@ import {
   ADD_SINGLE_USER,
   ADD_ERROR,
   REMOVE_ERROR,
-  GET_USER_DETAILS
+  GET_USER_DETAILS,
+  GET_ADMIN
 } from '../constants/actionType';
 
 const addUsersToState = users => ({
@@ -33,6 +34,11 @@ const removeErrors = () => ({
   type: REMOVE_ERROR
 });
 
+const getAdminAction = data => ({
+  type: GET_ADMIN,
+  data
+});
+
 const initialState = {
   user: {
     contracts: []
@@ -49,9 +55,9 @@ const initialState = {
  */
 export function getAllUsers() {
   return dispatch =>
-    axios.get('/api/users').then(
+    axios.get('/api/admin/user').then(
       ({ data }) => {
-        dispatch(addUsersToState(data.users.rows));
+        dispatch(addUsersToState(data.users));
       },
       ({ response }) => {
         console.log(response);
@@ -87,15 +93,49 @@ export function addNewUser(userData) {
  * @export
  * @returns {void}
  */
-export function getSingleUser(id) {
+export function getSingleUser() {
   return dispatch =>
-    axios.get(`/api/contracts/user/${id}`).then(
+    axios.get('/api/users/dashboard').then(
       ({ data }) => {
         dispatch(addSingleUserToState(data));
         return true;
       },
       ({ response }) => {
         dispatch(addSingleUserToState(initialState));
+        return false;
+      }
+    );
+}
+
+export function getAdmin() {
+  return dispatch =>
+    axios.get('/api/admin').then(
+      ({ data }) => {
+        dispatch(getAdminAction(data));
+      },
+      ({ response }) => {
+        console.log(response);
+      }
+    );
+}
+
+export function creditUser(data) {
+  return dispatch =>
+    axios.post('/api/finance/earnings', data).then(
+      () => true,
+      ({ response }) => {
+        console.log(response);
+        return false;
+      }
+    );
+}
+
+export function addSite(data) {
+  return dispatch =>
+    axios.post('/api/users/site', data).then(
+      () => true,
+      ({ response }) => {
+        console.log(response);
         return false;
       }
     );

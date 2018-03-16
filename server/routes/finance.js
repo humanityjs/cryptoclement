@@ -49,7 +49,7 @@ router.post('/earnings', authUserMiddleware, (req, res) => {
         email, amount, type, username, site_name: siteName, site_type: siteType
       }).then(() => {
         History.create({
-          username: email, email, amount, amountType: type, type: 'conversion'
+          username: email, email, amount, amountType: type, type: 'disbursement'
         }).then(() => res.status(200)
           .send({ message: 'Request submitted successfully! ' }))
           .catch(err => res.status(400).send({
@@ -73,45 +73,47 @@ router.post('/convert', authUserMiddleware, (req, res) => {
   const { value } = req.body;
   const type = req.body.type.toLowerCase();
   Earning.findOne({ email, type: 'usd' }).then((earning) => {
-    if (earning) {
-      if (amount > earning.amount) {
-        return res.status(400)
-          .send({ message: 'You do not have enough balance to convert' });
-      }
-      const newUsd = earning.amount - amount;
-      Earning.update({ email, type: 'usd' }, { amount: newUsd }).then(() => {
-        Earning.findOne({ email, type }).then((earn) => {
-          if (earn) {
-            const newAmount = earn.amount + value;
-            Earning.update({ email, type }, { amount: newAmount }).then(() => {
-              History.create({
-                username: email,
-                email,
-                amount,
-                amountType: 'usd',
-                type: 'conversion'
-              })
-                .then(() => res.status(200)
-                  .send({ message: 'Request submitted successfully! ' }));
-            });
-          } else {
-            Earning.create({ email, amount: value, type }).then(() => {
-              History.create({
-                username: email,
-                email,
-                amount,
-                amountType: 'usd',
-                type: 'conversion'
-              })
-                .then(() => res.status(200)
-                  .send({ message: 'Request submitted successfully! ' }));
-            });
-          }
-        });
-      });
+    if (!earning) {
+      return res.status(400)
+        .send({ message: 'You do not have money in your USD wallet yet!' });
     }
-    return res.status(400)
-      .send({ message: 'You do not have money in your USD wallet yet!' });
+    if (amount > earning.amount) {
+      return res.status(400)
+        .send({ message: 'You do not have enough balance to convert' });
+    }
+    const newUsd = earning.amount - amount;
+    Earning.update({ email, type: 'usd' }, { amount: newUsd }).then(() => {
+      Earning.findOne({ email, type }).then((earn) => {
+        if (earn) {
+          const newAmount = earn.amount + value;
+          Earning.update({ email, type }, { amount: newAmount }).then(() => {
+            History.create({
+              username: email,
+              email,
+              amount,
+              amountType: type,
+              type: 'conversion',
+              value
+            })
+              .then(() => res.status(200)
+                .send({ message: 'Request submitted successfully! ' }));
+          });
+        } else {
+          Earning.create({ email, amount: value, type }).then(() => {
+            History.create({
+              username: email,
+              email,
+              amount,
+              amountType: type,
+              type: 'conversion',
+              value
+            })
+              .then(() => res.status(200)
+                .send({ message: 'Request submitted successfully! ' }));
+          });
+        }
+      });
+    });
   });
 });
 
@@ -125,7 +127,7 @@ router.post('/payout', authUserMiddleware, (req, res) => {
       if (amount > earning.amount) {
         return res.status(400)
           .send({
-            message: `You do not have sufficient 
+            message: `You do not have sufficient
               balance to perform this operation`
           });
       }

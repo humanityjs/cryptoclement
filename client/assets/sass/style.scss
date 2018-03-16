@@ -230,8 +230,10 @@ html {
 // }
 .main-menu-right {
   li:last-child {
-    a {
-      padding: 0px;
-    }
+    padding: 0;
   }
+}
+
+.address {
+  margin-top: 55px;
 }
