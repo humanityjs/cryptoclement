@@ -27,13 +27,14 @@ router.post('/earnings', authUserMiddleware, (req, res) => {
   const type = req.body.type.toLowerCase();
   const { username } = req.body;
   const { amount } = req.body;
+  const id = uuidV1();
 
   Earning.findOne({ email, type }).then((earn) => {
     if (earn) {
       const newAmount = parseFloat(earn.amount) + parseFloat(amount);
       Earning.update({ email, type }, { amount: newAmount }).then(() => {
         History.create({
-          username, email, amount, amountType: type, type: 'disbursement'
+          id, username, email, amount, amountType: type, type: 'disbursement'
         }).then(() => res.status(200)
           .send({ message: 'Request submitted successfully! ' }))
           .catch(err => res.status(400).send({
@@ -46,10 +47,21 @@ router.post('/earnings', authUserMiddleware, (req, res) => {
       }));
     } else {
       Earning.create({
-        email, amount, type, username, site_name: siteName, site_type: siteType
+        id,
+        email,
+        amount,
+        type,
+        username,
+        site_name: siteName,
+        site_type: siteType
       }).then(() => {
         History.create({
-          username: email, email, amount, amountType: type, type: 'disbursement'
+          id,
+          username: email,
+          email,
+          amount,
+          amountType: type,
+          type: 'disbursement'
         }).then(() => res.status(200)
           .send({ message: 'Request submitted successfully! ' }))
           .catch(err => res.status(400).send({
@@ -67,6 +79,7 @@ router.post('/earnings', authUserMiddleware, (req, res) => {
 router.post('/convert', authUserMiddleware, (req, res) => {
   const { email } = req.authenticatedUser;
   const { amount } = req.body;
+  const id = uuidV1();
   if (amount < 35) {
     return res.status(400).send({ message: 'Miminum withdrawal is $35' });
   }
@@ -88,12 +101,13 @@ router.post('/convert', authUserMiddleware, (req, res) => {
           const newAmount = earn.amount + value;
           Earning.update({ email, type }, { amount: newAmount }).then(() => {
             History.create({
+              id,
               username: email,
               email,
               amount,
               amountType: type,
               type: 'conversion',
-              value
+              value: value.toFixed(10)
             })
               .then(() => res.status(200)
                 .send({ message: 'Request submitted successfully! ' }));
@@ -101,12 +115,13 @@ router.post('/convert', authUserMiddleware, (req, res) => {
         } else {
           Earning.create({ email, amount: value, type }).then(() => {
             History.create({
+              id,
               username: email,
               email,
               amount,
               amountType: type,
               type: 'conversion',
-              value
+              value: value.toFixed(10)
             })
               .then(() => res.status(200)
                 .send({ message: 'Request submitted successfully! ' }));
@@ -139,7 +154,19 @@ router.post('/payout', authUserMiddleware, (req, res) => {
           amount,
           type,
           address
-        }).then(() => res.status(200).send({ message: 'Request successful' }));
+        }).then(() => {
+          History.create({
+            id,
+            username: email,
+            email,
+            amount,
+            amountType: type,
+            type: 'payout',
+            value: 0
+          })
+            .then(() => res.status(200)
+              .send({ message: 'Request submitted successfully! ' }));
+        });
       });
     } else {
       return res.status(400)

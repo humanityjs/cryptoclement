@@ -28,7 +28,11 @@ class Dashboard extends Component {
       error: '',
       cashOutCrypto: '',
       cashOutAmount: 0,
-      cashOutAddress: ''
+      cashOutAddress: '',
+      passwordError: '',
+      currentPass: '',
+      newPass: '',
+      newPassConfirm: ''
     };
     // this.logOut = this.logOut.bind(this);
     this.status = this.status.bind(this);
@@ -42,6 +46,8 @@ class Dashboard extends Component {
     this.convert = this.convert.bind(this);
     this.convertIt = this.convertIt.bind(this);
     this.cashOut = this.cashOut.bind(this);
+    this.checkValue = this.checkValue.bind(this);
+    this.changePassword = this.changePassword.bind(this);
   }
 
   /**
@@ -259,6 +265,13 @@ class Dashboard extends Component {
     return Tool;
   }
 
+  checkValue(value, type) {
+    if (type === 'payout') {
+      return value === 0 ? 'pending' : 'processed';
+    }
+    return value;
+  }
+
   histories() {
     let History;
     const { histories } = this.props.user;
@@ -271,13 +284,13 @@ class Dashboard extends Component {
           <td>{history.type}</td>
           <td>{history.amountType}</td>
           <td>{history.amount || ''}</td>
-          <td>{history.value}</td>
+          <td>{this.checkValue(history.value, history.type)}</td>
         </tr>
       ));
     } else {
       History = (
         <tr>
-          <td colSpan="6" style={{ textAlign: 'center' }}>
+          <td colSpan="7" style={{ textAlign: 'center' }}>
             You have no histories to show
           </td>
         </tr>
@@ -335,9 +348,52 @@ class Dashboard extends Component {
       });
   }
 
+  changePassword() {
+    const { currentPass, newPass, newPassConfirm } = this.state;
+    this.setState({
+      passwordError: ''
+    });
+    if (!currentPass || !newPass || !newPassConfirm) {
+      this.setState({
+        passwordError: 'Please fill all fields'
+      });
+      return;
+    }
+    if (newPass !== newPassConfirm) { //
+      this.setState({
+        passwordError: 'Password does not match'
+      });
+      return;
+    }
+    axios.post('/api/auth/change-password', { newPass, currentPass })
+      .then(() => {
+        swal({
+          title: 'Success',
+          html: 'Password changed successfully',
+          type: 'success',
+          allowOutsideClick: false
+        }).then(() => {
+          this.setState({
+            newPass: '',
+            currentPass: '',
+            newPassConfirm: ''
+          });
+        });
+      }, ({ response }) => {
+        swal({
+          title: 'Error',
+          html: response.data.message,
+          type: 'error',
+          allowOutsideClick: false
+        });
+      });
+  }
+
   render() {
     const { user } = this.props;
-    const { conversionRate, amountToConvert, error } = this.state;
+    const {
+      conversionRate, amountToConvert, error, passwordError
+    } = this.state;
     const converted = (amountToConvert * conversionRate) - ((1 / 100) * (amountToConvert * conversionRate));
     return (
       <section id="main" className="sec-pad poker">
@@ -397,7 +453,12 @@ class Dashboard extends Component {
                           </button>
                         </div>
                         <div className="form-group">
-                          <button id="submit" className="btn btn-primary">
+                          <button
+                            id="submit"
+                            className="btn btn-primary"
+                            data-toggle="modal"
+                            data-target="#changePass"
+                          >
                             Change Password
                           </button>
                         </div>
@@ -643,6 +704,78 @@ class Dashboard extends Component {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Change password Modal */}
+        <div className="modal fade" id="changePass" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Change Password</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                {
+                  passwordError && (
+                    <span className="error" >{passwordError}</span>
+                  )
+                }
+                <div className="form-group">
+                  <label className="small" htmlFor="currentPass">
+                    Current Password
+                  </label>
+                  <input
+                    type="cashOutAddress"
+                    className="form-control"
+                    name="currentPass"
+                    aria-describedby="cryptoAddress"
+                    placeholder="Enter Old password"
+                    value={this.state.currentPass}
+                    onChange={this.onChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="small" htmlFor="newPass">
+                    New Password
+                  </label>
+                  <input
+                    type="cashOutAddress"
+                    className="form-control"
+                    name="newPass"
+                    aria-describedby="cryptoAddress"
+                    placeholder="Enter New Password"
+                    value={this.state.newPass}
+                    onChange={this.onChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="small" htmlFor="newPassConfirm">
+                    Repeat New Password
+                  </label>
+                  <input
+                    type="cashOutAddress"
+                    className="form-control"
+                    name="newPassConfirm"
+                    aria-describedby="cryptoAddress"
+                    placeholder="Confirm password"
+                    value={this.state.newPassConfirm}
+                    onChange={this.onChange}
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-primary" onClick={this.changePassword}>Save changes</button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>

@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import config from './config/config';
 // import validate from '../utils/validate';
 import User from '../models/user';
+import authUserMiddleware from './middlewares/authUserMiddleware';
 
 const router = express.Router();
 
@@ -45,6 +46,23 @@ router.post('/login', (req, res) => {
       });
     })
     .catch(error => res.status(400).send(error));
+});
+
+router.post('/change-password', authUserMiddleware, (req, res) => {
+  const { email } = req.authenticatedUser;
+  const { newPass, currentPass } = req.body;
+  const hashPassword = bcrypt.hashSync(newPass.toString());
+  User.findOne({ email })
+    .then((user) => {
+      if (!bcrypt.compareSync(currentPass, user.password)) {
+        return res.status(400).send({
+          message: 'Your current password is wrong. Please try again.'
+        });
+      }
+      User.update({ email }, { password: hashPassword })
+        .then(() => res.status(200).send({ message: 'Password updated' }))
+        .catch(err => res.status(400).send({ err }));
+    });
 });
 
 router.post('/logout', (req, res) => res

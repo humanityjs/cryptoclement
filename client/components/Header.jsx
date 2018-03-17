@@ -252,7 +252,12 @@ class Header extends Component {
                     )}
                     {isAuthenticated && (
                       <li>
-                        <a href="/logout" onClick={this.logOut}>
+                        <a
+                          href="/logout"
+                          className="btn btn-primary"
+                          style={{ marginLeft: '10px', color: '#fff' }}
+                          onClick={this.logOut}
+                        >
                           <font size="1">logout</font>
                         </a>
                       </li>

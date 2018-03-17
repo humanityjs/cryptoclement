@@ -1,6 +1,8 @@
 import express from 'express';
+import uuidV1 from 'uuid/v1';
 import Site from '../models/sites';
 import Payout from '../models/payouts';
+import History from '../models/history';
 import User from '../models/user';
 import authUserMiddleware from './middlewares/authUserMiddleware';
 
@@ -35,8 +37,10 @@ router.post('/confirm-payment', authUserMiddleware, (req, res) => {
         .send({ message: 'Cannot find a payout with that id' });
     }
     Payout.update({ id }, { status: 1 })
-      .then(() => res.status(200)
-        .send({ message: 'Payment request confirmed successfully' }));
+      .then(() => {
+        History.update({ id }, { value: 1 }).then(() => res.status(200)
+          .send({ message: 'Payment request confirmed successfully' }));
+      });
   });
 });
 
