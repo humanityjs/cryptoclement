@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter, Redirect } from 'react-router-dom';
-import loginAction from '../actions/loginAction';
+import loginAction, { login2fa } from '../actions/loginAction';
 
 class Subnav extends Component {
   constructor(props) {
@@ -9,10 +9,12 @@ class Subnav extends Component {
     this.state = {
       email: '',
       password: '',
-      error: ''
+      error: '',
+      otp: ''
     };
     this.onChange = this.onChange.bind(this);
     this.onLogin = this.onLogin.bind(this);
+    this.loginOtp = this.loginOtp.bind(this);
   }
 
   onChange(e) {
@@ -35,12 +37,40 @@ class Subnav extends Component {
       return;
     }
     this.props.loginAction({ email, password }).then((res) => {
+      if (res.status && !res.tfa) {
+        window.location.href = '/dashboard';
+      } else if (res.status && res.tfa) {
+        this.setState({
+          stage2: true
+        });
+      } else {
+        this.setState({
+          error: 'Invalid login credentials'
+        });
+      }
+    });
+  }
+
+  loginOtp(e) {
+    e.preventDefault();
+    this.setState({
+      error: ''
+    });
+    const { otp, email } = this.state;
+    if (!otp) {
+      this.setState({
+        error: 'Please enter otp'
+      });
+      return;
+    }
+    this.props.login2fa({ tfatoken: otp, email }).then((res) => {
       if (res) {
         window.location.href = '/dashboard';
+      } else {
+        this.setState({
+          error: 'Invalid OTP. Please enter a valid one.'
+        });
       }
-      this.setState({
-        error: 'Invalid login credentials'
-      });
     });
   }
   render() {
@@ -136,36 +166,56 @@ class Subnav extends Component {
                               <div className="modal-body">
                                 <div className="text-left login-form">
                                   {this.state.error && <span>{this.state.error}</span>}
-                                  <form action="" method="">
-                                    <div className="form-group">
-                                      <label htmlFor="loginEmail">Email address</label>
-                                      <input
-                                        type="loginEmail"
-                                        className="form-control"
-                                        id="loginEmail"
-                                        aria-describedby="loginEmail"
-                                        placeholder="Enter email"
-                                        name="email"
-                                        value={this.state.email}
-                                        onChange={this.onChange}
-                                      />
-                                    </div>
-                                    <div className="form-group">
-                                      <label htmlFor="loginPassword">Password</label>
-                                      <input
-                                        type="password"
-                                        className="form-control"
-                                        id="loginPassword"
-                                        placeholder="Password"
-                                        name="password"
-                                        value={this.state.password}
-                                        onChange={this.onChange}
-                                      />
-                                    </div>
-                                    <div className="text-center">
-                                      <button id="loginBtn" className="cmn-btn" onClick={this.onLogin}>Login</button>
-                                    </div>
-                                  </form>
+                                  {!this.state.stage2 ? (
+                                    <form action="" method="">
+                                      <div className="form-group">
+                                        <label htmlFor="loginEmail">Email address</label>
+                                        <input
+                                          type="loginEmail"
+                                          className="form-control"
+                                          id="loginEmail"
+                                          aria-describedby="loginEmail"
+                                          placeholder="Enter email"
+                                          name="email"
+                                          value={this.state.email}
+                                          onChange={this.onChange}
+                                        />
+                                      </div>
+                                      <div className="form-group">
+                                        <label htmlFor="loginPassword">Password</label>
+                                        <input
+                                          type="password"
+                                          className="form-control"
+                                          id="loginPassword"
+                                          placeholder="Password"
+                                          name="password"
+                                          value={this.state.password}
+                                          onChange={this.onChange}
+                                        />
+                                      </div>
+                                      <div className="text-center">
+                                        <button id="loginBtn" className="cmn-btn" onClick={this.onLogin}>Login</button>
+                                      </div>
+                                    </form>
+                                  ) : (
+                                    <div>
+                                        <p>Please generate an OTP code using google authenticate to continue</p>
+                                        <div className="form-group">
+                                          <label htmlFor="loginPassword">OTP</label>
+                                          <input
+                                            type="password"
+                                            className="form-control"
+                                            placeholder="Password"
+                                            name="otp"
+                                            value={this.state.otp}
+                                            onChange={this.onChange}
+                                          />
+                                        </div>
+                                        <div className="text-center">
+                                          <button className="cmn-btn" onClick={this.loginOtp}>Verify Token</button>
+                                        </div>
+                                      </div>
+                                    )}
                                   <ul className="reg-menu text-center">
                                     <li>
                                       <a href="/contact">Contact Us</a>
@@ -259,4 +309,4 @@ const mapStateToProps = state => ({
   pageInfo: state.pageInfo
 });
 
-export default connect(mapStateToProps, { loginAction })(withRouter(Subnav));
+export default connect(mapStateToProps, { loginAction, login2fa })(withRouter(Subnav));

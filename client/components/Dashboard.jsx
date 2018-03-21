@@ -32,7 +32,10 @@ class Dashboard extends Component {
       passwordError: '',
       currentPass: '',
       newPass: '',
-      newPassConfirm: ''
+      newPassConfirm: '',
+      qrError: '',
+      token: '',
+      stage2: false
     };
     // this.logOut = this.logOut.bind(this);
     this.status = this.status.bind(this);
@@ -48,6 +51,8 @@ class Dashboard extends Component {
     this.cashOut = this.cashOut.bind(this);
     this.checkValue = this.checkValue.bind(this);
     this.changePassword = this.changePassword.bind(this);
+    this.generateQR = this.generateQR.bind(this);
+    this.confirmToken = this.confirmToken.bind(this);
   }
 
   /**
@@ -389,6 +394,39 @@ class Dashboard extends Component {
       });
   }
 
+  generateQR() {
+    axios.post('/api/auth/generate-2fa').then(({ data }) => {
+      this.setState({
+        qrImg: data.dataURL,
+        stage2: true
+      });
+    }, ({ response }) => {
+      this.setState({
+        qrError: response.data.message
+      });
+    });
+  }
+
+  confirmToken() {
+    this.setState({
+      qrError: ''
+    });
+    axios.post('/api/auth/verify-2fa', { token: this.state.token }).then(({ data }) => {
+      swal({
+        title: 'Success',
+        html: 'Two factor authentication added successfully',
+        type: 'error',
+        allowOutsideClick: false
+      }).then(() => {
+        window.location.reload();
+      });
+    }, ({ response }) => {
+      this.setState({
+        qrError: response.data.message
+      });
+    });
+  }
+
   render() {
     const { user } = this.props;
     const {
@@ -448,7 +486,12 @@ class Dashboard extends Component {
                     <div className="flex-first">
                       <div className="settings">
                         <div className="form-group">
-                          <button id="submit" className="btn btn-primary">
+                          <button
+                            id="submit"
+                            className="btn btn-primary"
+                            data-toggle="modal"
+                            data-target="#2fa"
+                          >
                             Add 2-factor Authentication
                           </button>
                         </div>
@@ -769,6 +812,71 @@ class Dashboard extends Component {
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-primary" onClick={this.changePassword}>Save changes</button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        {/* 2fa Modal es */}
+        <div className="modal fade" id="2fa" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Add Two-Factor authentication</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                {
+                  this.state.qrError && (
+                    <span className="error" >{this.state.qrError}</span>
+                  )
+                }
+                <div className="form-group">
+                  <button
+                    className="btn btn-primary"
+                    onClick={this.generateQR}
+                  >
+                    Generate QR image
+                  </button>
+                </div>
+
+                {this.state.stage2 && (
+                  <div>
+                    <p>Please scan this QR image using google authenticator and input the generated token below.</p>
+                    <div>
+                      <img src={this.state.qrImg} alt="QR image" />
+                    </div>
+                    <div className="form-group">
+                      <label className="small" htmlFor="newPass">
+                        Token
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="token"
+                        aria-describedby="token"
+                        placeholder="Enter Token"
+                        value={this.state.token}
+                        onChange={this.onChange}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer">
+                {this.state.stage2 && (
+                  <button type="button" className="btn btn-primary" onClick={this.confirmToken}>Enable 2fa</button>
+                )}
                 <button
                   type="button"
                   className="btn btn-secondary"
