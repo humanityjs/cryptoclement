@@ -19,9 +19,6 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: this.props.auth.user,
-      details: this.props.user,
-      loading: true,
       cryptocurrencyToCovertTo: '',
       amountToConvert: 0,
       conversionRate: 0,
@@ -35,7 +32,8 @@ class Dashboard extends Component {
       newPassConfirm: '',
       qrError: '',
       token: '',
-      stage2: false
+      stage2: false,
+      secretToken: ''
     };
     // this.logOut = this.logOut.bind(this);
     this.status = this.status.bind(this);
@@ -53,6 +51,7 @@ class Dashboard extends Component {
     this.changePassword = this.changePassword.bind(this);
     this.generateQR = this.generateQR.bind(this);
     this.confirmToken = this.confirmToken.bind(this);
+    this.disableTfa = this.disableTfa.bind(this);
   }
 
   /**
@@ -398,6 +397,7 @@ class Dashboard extends Component {
     axios.post('/api/auth/generate-2fa').then(({ data }) => {
       this.setState({
         qrImg: data.dataURL,
+        secretToken: data.tempSecret,
         stage2: true
       });
     }, ({ response }) => {
@@ -412,10 +412,11 @@ class Dashboard extends Component {
       qrError: ''
     });
     axios.post('/api/auth/verify-2fa', { token: this.state.token }).then(({ data }) => {
+      window.localStorage.setItem('jwtTokenBTCGrinders', data.token);
       swal({
         title: 'Success',
         html: 'Two factor authentication added successfully',
-        type: 'error',
+        type: 'success',
         allowOutsideClick: false
       }).then(() => {
         window.location.reload();
@@ -424,6 +425,35 @@ class Dashboard extends Component {
       this.setState({
         qrError: response.data.message
       });
+    });
+  }
+
+  disableTfa() {
+    swal({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Disable 2fa'
+    }).then((result) => {
+      if (result.value) {
+        axios.post('/api/auth/disable-2fa').then(({ data }) => {
+          window.localStorage.setItem('jwtTokenBTCGrinders', data.token);
+          swal(
+            'Success!',
+            '2fa disabled successfully',
+            'success'
+          ).then(() => {
+            window.location.reload();
+          });
+        }, ({ response }) => {
+          swal(
+            'Error',
+            response.data.message,
+            'error'
+          );
+        });
+      }
     });
   }
 
@@ -486,14 +516,26 @@ class Dashboard extends Component {
                     <div className="flex-first">
                       <div className="settings">
                         <div className="form-group">
-                          <button
-                            id="submit"
-                            className="btn btn-primary"
-                            data-toggle="modal"
-                            data-target="#2fa"
-                          >
-                            Add 2-factor Authentication
-                          </button>
+                          {
+                            this.props.auth.user.tfa ? (
+                              <button
+                                id="submit"
+                                className="btn btn-primary"
+                                onClick={this.disableTfa}
+                              >
+                                Disable 2-factor Authentication
+                              </button>
+                            ) : (
+                              <button
+                                  id="submit"
+                                  className="btn btn-primary"
+                                  data-toggle="modal"
+                                  data-target="#2fa"
+                                >
+                                  Add 2-factor Authentication
+                                </button>
+                              )
+                          }
                         </div>
                         <div className="form-group">
                           <button
@@ -852,7 +894,9 @@ class Dashboard extends Component {
 
                 {this.state.stage2 && (
                   <div>
-                    <p>Please scan this QR image using google authenticator and input the generated token below.</p>
+                    <p>Please enter this code <strong>{this.state.secretToken}</strong> on google authenticator and input the generated token below</p>
+                    <p>-- OR --</p>
+                    <p>Scan this QR image using google authenticator and input the generated token below.</p>
                     <div>
                       <img src={this.state.qrImg} alt="QR image" />
                     </div>
@@ -888,7 +932,7 @@ class Dashboard extends Component {
             </div>
           </div>
         </div>
-      </section>
+      </section >
     );
   }
 }

@@ -43,6 +43,7 @@ router.post('/login', (req, res) => {
                 uuid: user.uuid,
                 roleId: user.role,
                 email: user.email,
+                tfa: false
               },
               config.jwtSecret,
             );
@@ -88,11 +89,39 @@ router.post('/login-2fa', (req, res) => {
           uuid: user.uuid,
           roleId: user.role,
           email: user.email,
+          tfa: true
         },
         config.jwtSecret,
       );
       return res.status(200).send({
         message: 'Authentication successful',
+        token,
+        tfa: false
+      });
+    });
+  });
+});
+
+router.post('/disable-2fa', authUserMiddleware, (req, res) => {
+  const { email, tfa } = req.authenticatedUser;
+  if (!tfa) {
+    return res.status(400).send({
+      message: 'You do not have Two factor authentication enabled'
+    });
+  }
+  Tfa.deleteOne({ email }).then(() => {
+    User.findOne({ email }).then((user) => {
+      const token = jwt.sign(
+        {
+          uuid: user.uuid,
+          roleId: user.role,
+          email: user.email,
+          tfa: false
+        },
+        config.jwtSecret,
+      );
+      return res.status(200).send({
+        message: 'Two factor authentication deactivated successfully',
         token,
         tfa: false
       });
@@ -165,8 +194,24 @@ router.post('/verify-2fa', authUserMiddleware, (req, res) => {
       return res.status(400).send('Invalid token, verification failed');
     }
     Tfa.update({ email }, { secret: user.tempSecret })
-      .then(() => res.status(200)
-        .send({ message: 'Two-factor authentication enabled' }))
+      .then(() => {
+        User.findOne({ email }).then((user) => {
+          const tokenSigned = jwt.sign(
+            {
+              uuid: user.uuid,
+              roleId: user.role,
+              email: user.email,
+              tfa: true
+            },
+            config.jwtSecret,
+          );
+          return res.status(200).send({
+            message: 'Authentication successful',
+            token: tokenSigned,
+            tfa: true
+          });
+        });
+      })
       .catch(err => res.status(400).send({ err }));
   });
 });

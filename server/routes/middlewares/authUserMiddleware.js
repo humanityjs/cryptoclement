@@ -31,6 +31,7 @@ export default (req, res, next) => {
             req.authenticatedUser.role = user.role;
             req.authenticatedUser.email = user.email;
             req.authenticatedUser.uuid = user.uuid;
+            req.authenticatedUser.tfa = decoded.tfa;
             next();
           });
       }
